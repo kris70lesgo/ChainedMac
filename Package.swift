@@ -1,0 +1,17 @@
+// swift-tools-version: 5.9
+import PackageDescription
+
+let package = Package(
+    name: "ChainYourMac",
+    platforms: [.macOS(.v13)],
+    products: [
+        .executable(name: "ChainYourMac", targets: ["ChainYourMac"])
+    ],
+    targets: [
+        .executableTarget(
+            name: "ChainYourMac",
+            path: "Sources/ChainYourMac",
+            exclude: ["Resources"]
+        )
+    ]
+)
