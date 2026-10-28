@@ -3,313 +3,1162 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f4f3ed">
-  <meta name="description" content="A calmer way to work across desktop windows. ChainYourMac arranges Mac and Windows app windows in one horizontal strip you can focus and restore.">
+  <meta name="theme-color" content="#c5b4ef">
+  <meta name="description" content="ChainedMac puts your open windows in one calm strip. Focus the next window with a key, then restore your original desktop whenever you want.">
+  <meta property="og:title" content="ChainedMac — make room for the work">
+  <meta property="og:description" content="A calmer way to move through the windows you already have open.">
+  <meta property="og:type" content="website">
   <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=purple-mark">
-  <title>ChainYourMac — make room for the work</title>
+  <title>ChainedMac — make room for the work</title>
   <style>
     :root {
       color-scheme: light;
-      --paper: #f4f3ed;
-      --paper-deep: #e9e8df;
-      --ink: #1e2923;
-      --ink-soft: #53635a;
-      --line: #d7d9cf;
-      --orange: #e75a31;
-      --orange-dark: #c84420;
-      --green: #d5dfc7;
-      --dark: #19231f;
-      --serif: "Iowan Old Style", "Palatino Linotype", Baskerville, Georgia, serif;
+      --paper: #fffdf7;
+      --paper-warm: #f6f1e6;
+      --ink: #241c32;
+      --muted: #746d61;
+      --line: #e4ddcf;
+      --lavender: #c5b4ef;
+      --lavender-light: #efe8ff;
+      --orange: #ed5a31;
+      --purple: #5b21b6;
+      --purple-dark: #351168;
+      --plum: #21192d;
+      --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Baskerville, Georgia, serif;
       --sans: "Avenir Next", Avenir, "Segoe UI", sans-serif;
       --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
     }
+
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
     button, a { font: inherit; }
     button { cursor: pointer; }
     a { color: inherit; text-decoration: none; }
-    .shell { width: min(1220px, calc(100% - 68px)); margin: 0 auto; }
-    .topbar { height: 78px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
-    .brand { display: flex; gap: 11px; align-items: center; font-size: 13px; letter-spacing: -.035em; font-weight: 700; }
-    .brand-mark { display: block; width: 24px; height: 32px; object-fit: contain; }
-    .navlinks { display: flex; align-items: center; gap: 29px; font-size: 12px; color: var(--ink-soft); }
-    .navlinks a:hover { color: var(--orange-dark); }
-    .nav-download { color: var(--ink) !important; font-weight: 700; }
-    .hero { display: grid; grid-template-columns: .9fr 1.1fr; gap: 48px; align-items: center; padding: 76px 0 84px; min-height: 675px; }
-    .eyebrow { display: flex; gap: 10px; align-items: center; font: 10px var(--mono); letter-spacing: .11em; text-transform: uppercase; color: var(--ink-soft); }
-    .eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--orange); }
-    h1, h2, p { margin-top: 0; }
-    h1 { max-width: 560px; margin: 26px 0 22px; font: 400 clamp(54px, 6.4vw, 86px)/.94 var(--serif); letter-spacing: -.065em; }
-    h1 em { color: var(--orange); font-style: italic; }
-    .hero-copy > p { max-width: 440px; margin-bottom: 28px; color: var(--ink-soft); font-size: 15px; line-height: 1.75; }
-    .hero-actions { display: flex; align-items: center; gap: 11px; flex-wrap: wrap; }
-    .button { display: inline-flex; justify-content: center; align-items: center; gap: 10px; border: 1px solid transparent; border-radius: 4px; min-height: 48px; padding: 0 18px; font-size: 12px; font-weight: 700; transition: transform .2s, background .2s, border .2s; }
-    .button:hover { transform: translateY(-2px); }
-    .button-primary { background: var(--orange); color: #fffaf5; box-shadow: 3px 3px 0 var(--ink); }
-    .button-primary:hover { background: var(--orange-dark); }
-    .button-quiet { border-color: var(--line); background: transparent; color: var(--ink); }
-    .button-quiet:hover { border-color: var(--ink-soft); }
-    .hero-note { margin: 17px 0 0; font: 10px var(--mono); color: #738077; }
-    .stage { position: relative; min-width: 0; padding: 22px 0 42px 28px; }
-    .stage::before { content: ""; position: absolute; width: 240px; height: 240px; top: -15px; right: -25px; border: 1px solid #d6ddd0; border-radius: 50%; box-shadow: 0 0 0 23px var(--paper), 0 0 0 24px #d6ddd0, 0 0 0 48px var(--paper), 0 0 0 49px #d6ddd0; z-index: 0; }
-    .desktop { position: relative; z-index: 1; background: #fefdfa; border: 1px solid #c8ccc3; border-radius: 13px; overflow: hidden; box-shadow: 0 18px 45px #17251e1a, 0 3px 8px #17251e12; transform: rotate(-1deg); }
-    .desktop-bar { height: 35px; display: flex; align-items: center; gap: 6px; padding: 0 13px; background: #f1f1ec; border-bottom: 1px solid #dedfd9; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: #d3d5ce; }
-    .dot:nth-child(1) { background: #e98070; } .dot:nth-child(2) { background: #e6c16b; } .dot:nth-child(3) { background: #87ba83; }
-    .desktop-label { margin: 0 auto; padding-right: 40px; color: #7c847d; font: 9px var(--mono); letter-spacing: .06em; }
-    .desktop-canvas { position: relative; height: 323px; overflow: hidden; padding: 29px 0 26px; background: radial-gradient(ellipse at 75% 20%, #e8eddf 0, transparent 50%), #faf9f4; }
-    .desktop-canvas::after { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(#61706308 1px, transparent 1px), linear-gradient(90deg, #61706308 1px, transparent 1px); background-size: 20px 20px; }
-    .float-window { position: absolute; width: 66%; height: 205px; top: 66px; border-radius: 8px; background: #fffefa; border: 1px solid #cfd3ca; overflow: hidden; box-shadow: 0 8px 22px #16271e1a; }
-    .float-window.one { left: -12%; top: 84px; opacity: .73; }
-    .float-window.two { left: 17%; top: 48px; z-index: 2; }
-    .float-window.three { left: 48%; top: 77px; z-index: 3; border: 2px solid var(--orange); }
-    .winbar { display: flex; align-items: center; gap: 4px; height: 27px; padding: 0 8px; background: #f6f6f1; border-bottom: 1px solid #e7e7e1; }
-    .winbar .dot { width: 5px; height: 5px; }
-    .winname { margin: 0 auto; padding-right: 24px; color: #798278; font: 8px var(--mono); }
-    .paper-content { padding: 20px 19px; }
-    .paper-kicker { font: 8px var(--mono); color: #8d958b; letter-spacing: .1em; }
-    .paper-head { max-width: 190px; margin: 10px 0; font: 22px/1.02 var(--serif); letter-spacing: -.04em; }
-    .paper-line { height: 4px; margin-top: 7px; background: #e9ebe4; border-radius: 8px; }
-    .paper-line.short { width: 65%; }
-    .code-content { display: grid; grid-template-columns: 22px 1fr; gap: 0 8px; padding: 15px; font: 8px/1.7 var(--mono); }
-    .line-no { text-align: right; color: #aab0a6; }
-    .code-green { color: #526d55; } .code-orange { color: var(--orange-dark); }
-    .focus-ribbon { position: absolute; right: 14px; top: 14px; z-index: 5; padding: 7px 9px; background: var(--ink); color: #e7eee1; border-radius: 3px; font: 8px var(--mono); letter-spacing: .07em; }
-    .strip-rail { position: absolute; z-index: 5; left: 22px; right: 22px; bottom: 17px; display: flex; gap: 4px; height: 20px; }
-    .rail-window { flex: 1; min-width: 5px; border-radius: 2px; background: #c8cfc3; }
-    .rail-window.active { flex: 1.5; background: var(--orange); }
-    .dock { display: flex; gap: 8px; justify-content: center; align-items: center; width: max-content; margin: 10px auto 0; padding: 7px 12px; border: 1px solid #e0e1da; border-radius: 9px; background: #fffefaed; box-shadow: 0 2px 8px #1b281b15; }
-    .dock-icon { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 6px; color: #f7f5eb; background: #546b5b; font: 9px var(--mono); }
-    .dock-icon:nth-child(2) { background: #59848a; } .dock-icon:nth-child(3) { background: #4d5157; } .dock-icon:nth-child(4) { background: #d8a04a; }
-    .stage-caption { position: absolute; z-index: 4; left: 0; bottom: 7px; display: flex; align-items: center; gap: 9px; font: 9px var(--mono); color: var(--ink-soft); }
-    .caption-line { display: block; width: 37px; height: 1px; background: var(--orange); }
-    .manifesto { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 26px 0; display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center; gap: 24px; }
-    .manifesto p { max-width: 300px; margin: 0; font: 17px/1.4 var(--serif); }
-    .manifesto p:first-child { font-size: 13px; color: var(--ink-soft); font-family: var(--sans); }
-    .manifesto p:last-child { text-align: right; font: 10px var(--mono); letter-spacing: .08em; color: var(--ink-soft); }
-    .demo-section { background: var(--dark); color: #f1f0e8; padding: 97px 0 93px; overflow: hidden; }
-    .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 36px; }
-    .section-heading .eyebrow { color: #a6b1a4; }
-    .section-heading h2 { margin: 17px 0 0; font: 400 clamp(35px, 4.7vw, 55px)/1 var(--serif); letter-spacing: -.045em; }
-    .section-heading p { max-width: 245px; margin: 0 0 3px; color: #a6b1a4; font-size: 12px; line-height: 1.65; }
-    .sim-shell { border: 1px solid #445047; border-radius: 9px; overflow: hidden; background: #202b25; box-shadow: 0 20px 50px #080f0c44; }
-    .sim-head { height: 44px; padding: 0 14px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #354239; background: #25312a; }
-    .sim-head .sim-title { margin-left: 8px; font: 9px var(--mono); letter-spacing: .05em; color: #aab7aa; }
-    .sim-head .live-tag { margin-left: auto; display: flex; gap: 6px; align-items: center; color: #b8c9b1; font: 8px var(--mono); letter-spacing: .08em; }
-    .live-pip { width: 6px; height: 6px; background: #a2c483; border-radius: 50%; box-shadow: 0 0 10px #a2c483aa; }
-    .sim-display { position: relative; height: 363px; overflow: hidden; border-bottom: 1px solid #354239; touch-action: pan-y; cursor: grab; }
-    .sim-display.dragging { cursor: grabbing; }
-    .sim-ruler { pointer-events: none; position: absolute; inset: 0; opacity: .28; background-image: linear-gradient(#77847a16 1px, transparent 1px), linear-gradient(90deg, #77847a16 1px, transparent 1px); background-size: 26px 26px; }
-    .sim-strip { position: relative; height: 100%; display: flex; align-items: center; gap: 16px; padding: 0 32px; transform: translateX(0); transition: transform .42s cubic-bezier(.2,.8,.2,1); will-change: transform; }
-    .sim-window { position: relative; flex: 0 0 var(--window-width, 340px); height: 265px; overflow: hidden; border-radius: 8px; background: #f5f5ee; color: var(--ink); box-shadow: 0 8px 25px #060d0980; border: 1px solid #b9c1b6; transition: flex-basis .32s, opacity .25s, border-color .25s, transform .28s; }
-    .sim-window.focused { border: 2px solid #ee7049; transform: translateY(-4px); }
-    .sim-window.dimmed:not(.focused) { opacity: .43; }
-    .sim-window-head { height: 32px; display: flex; align-items: center; gap: 5px; padding: 0 10px; background: #e9ebe4; border-bottom: 1px solid #d8ddd3; }
-    .sim-window-head .dot { width: 7px; height: 7px; }
-    .sim-window-title { flex: 1; text-align: center; padding-right: 30px; color: #69746b; font: 9px var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .close-window { border: 0; background: transparent; color: #7a8379; width: 19px; height: 19px; border-radius: 50%; font-size: 14px; line-height: 1; padding: 0; }
-    .close-window:hover { background: #d9dcd4; color: var(--orange-dark); }
-    .sim-window-body { height: calc(100% - 32px); padding: 19px 21px; overflow: hidden; }
-    .surface-tag { margin-bottom: 12px; color: #829083; font: 8px var(--mono); letter-spacing: .12em; text-transform: uppercase; }
-    .surface-heading { max-width: 250px; margin: 0 0 11px; font: 25px/1.06 var(--serif); letter-spacing: -.04em; }
-    .surface-copy { max-width: 250px; margin: 0; color: #748075; font: 10px/1.6 var(--sans); }
-    .surface-lines { margin-top: 19px; display: grid; gap: 6px; }
-    .surface-line { height: 5px; width: 84%; border-radius: 5px; background: #dfe3da; }
-    .surface-line:nth-child(2) { width: 65%; } .surface-line:nth-child(3) { width: 74%; }
-    .surface-code { display: grid; grid-template-columns: 19px 1fr; gap: 0 8px; font: 9px/1.8 var(--mono); color: #677269; }
-    .surface-code .code-n { color: #a2a99f; text-align: right; }
-    .surface-code .hl { color: #b84d30; }
-    .surface-terminal { background: #17211c; color: #d6dfd1; border-radius: 5px; padding: 13px 14px; font: 9px/1.8 var(--mono); }
-    .surface-terminal .prompt { color: #9cb486; }
-    .surface-mail { width: 82%; padding: 11px 12px; border-radius: 5px; background: white; border: 1px solid #e0e4dc; color: #69746b; font-size: 9px; }
-    .surface-mail b { display: block; margin: 7px 0; color: #27332b; font-size: 11px; }
-    .sim-footer { display: flex; align-items: center; padding: 11px 15px; border-top: 1px solid #354239; color: #aab7aa; font: 8px var(--mono); letter-spacing: .04em; }
-    .sim-footer .counter { color: #e9e9dd; }
-    .sim-controls { display: grid; grid-template-columns: 1fr auto; gap: 18px; padding: 16px; background: #212d26; }
-    .app-picker { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-    .control-label { width: 100%; margin-bottom: 4px; color: #89988b; font: 8px var(--mono); text-transform: uppercase; letter-spacing: .13em; }
-    .app-button, .tool-button { border: 1px solid #435147; background: #29372f; color: #dfe6dc; border-radius: 4px; padding: 8px 10px; font: 9px var(--mono); transition: border .18s, background .18s, color .18s; }
-    .app-button:hover, .tool-button:hover { border-color: #cf7857; background: #34443a; }
-    .tool-button.active { background: #de5a32; border-color: #de5a32; color: white; }
-    .toolbox { display: flex; max-width: 380px; justify-content: flex-end; flex-wrap: wrap; gap: 6px; align-content: end; }
-    .shortcuts { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 16px; color: #8e9b90; font: 8px var(--mono); }
-    .shortcuts span { display: flex; align-items: center; gap: 5px; }
-    kbd { padding: 3px 5px; border: 1px solid #4a584e; border-radius: 3px; color: #d4dbd1; font: inherit; }
-    .status-message { margin-left: auto; color: #d78b6e; }
-    .principles { padding: 103px 0; }
-    .principles-top { display: grid; grid-template-columns: .8fr 1.2fr; gap: 70px; align-items: start; margin-bottom: 62px; }
-    .principles-top h2 { margin: 16px 0 0; font: 400 clamp(41px, 5vw, 63px)/.97 var(--serif); letter-spacing: -.055em; }
-    .principles-top p { max-width: 440px; margin: 30px 0 0; color: var(--ink-soft); font-size: 14px; line-height: 1.75; }
-    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); }
-    .feature { min-height: 200px; padding: 25px 25px 20px 0; border-bottom: 1px solid var(--line); }
-    .feature + .feature { padding-left: 25px; border-left: 1px solid var(--line); }
-    .feature-number { color: var(--orange); font: 10px var(--mono); }
-    .feature h3 { margin: 24px 0 9px; font: 23px var(--serif); font-weight: 400; letter-spacing: -.02em; }
-    .feature p { max-width: 280px; margin: 0; color: var(--ink-soft); font-size: 11px; line-height: 1.7; }
-    .feature:nth-child(4) { grid-column: 1; }
-    .download-section { position: relative; padding: 75px 0 79px; background: var(--green); overflow: hidden; }
-    .download-section::after { content: "CYM"; position: absolute; right: -22px; bottom: -105px; color: #19231f0b; font: 300 300px/.9 var(--serif); letter-spacing: -.12em; pointer-events: none; }
-    .download-inner { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: end; gap: 50px; }
-    .download-inner h2 { max-width: 570px; margin: 19px 0 14px; font: 400 clamp(42px, 5.8vw, 70px)/.95 var(--serif); letter-spacing: -.06em; }
-    .download-inner p { margin: 0; color: #536450; font-size: 12px; line-height: 1.65; }
-    .download-actions { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
-    .footer { padding: 25px 0; display: flex; justify-content: space-between; align-items: center; color: #7d887e; font: 9px var(--mono); }
-    .footer-links { display: flex; gap: 20px; }
-    .toast { position: fixed; z-index: 30; left: 50%; bottom: 23px; padding: 11px 15px; border: 1px solid #5a6c5e; border-radius: 4px; background: #1e2923; color: #edf1e8; box-shadow: 0 5px 18px #141c16a6; font: 10px var(--mono); opacity: 0; transform: translate(-50%, 12px); pointer-events: none; transition: opacity .22s, transform .22s; }
-    .toast.visible { opacity: 1; transform: translate(-50%, 0); }
-    @media (max-width: 900px) {
-      .hero { gap: 15px; grid-template-columns: .85fr 1.15fr; }
-      .stage { padding-left: 7px; }
-      .stage::before { right: -10px; width: 170px; height: 170px; }
-      .sim-controls { grid-template-columns: 1fr; }
-      .toolbox { justify-content: flex-start; max-width: none; }
-      .principles-top { gap: 35px; }
+    button:focus-visible, a:focus-visible { outline: 2px solid var(--purple); outline-offset: 3px; }
+    img { max-width: 100%; }
+    .icon-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+    .ui-icon { display: block; width: 16px; height: 16px; flex: 0 0 auto; }
+    .ui-icon.small { width: 14px; height: 14px; }
+    .shell { width: min(1180px, calc(100% - 52px)); margin: 0 auto; }
+    .skip-link {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 100;
+      padding: 10px 14px;
+      border-radius: 99px;
+      background: var(--ink);
+      color: white;
+      transform: translateY(-150%);
     }
-    @media (max-width: 660px) {
-      .shell { width: min(100% - 36px, 520px); }
-      .topbar { height: 66px; }
-      .navlinks { gap: 15px; font-size: 10px; }
-      .navlinks a:nth-child(1) { display: none; }
-      .hero { display: block; min-height: 0; padding: 59px 0 69px; }
-      h1 { max-width: 440px; font-size: clamp(57px, 17vw, 80px); }
-      .hero-copy > p { font-size: 13px; }
-      .stage { margin-top: 24px; padding: 10px 0 34px 2px; }
-      .desktop-canvas { height: 274px; }
-      .float-window { height: 178px; }
-      .float-window.one { top: 72px; }
-      .float-window.two { top: 39px; }
-      .float-window.three { top: 65px; }
-      .paper-content { padding: 15px 13px; }
-      .paper-head { font-size: 18px; }
-      .manifesto { grid-template-columns: 1fr 1fr; gap: 16px; }
-      .manifesto p:nth-child(2) { text-align: right; }
-      .manifesto p:last-child { grid-column: 1 / -1; text-align: left; }
-      .demo-section { padding: 65px 0; }
-      .section-heading { display: block; }
-      .section-heading p { margin-top: 16px; }
-      .sim-display { height: 318px; }
-      .sim-window { height: 240px; }
-      .sim-controls { padding: 12px; }
-      .shortcuts { gap: 10px; }
-      .shortcuts .status-message { flex-basis: 100%; margin-left: 0; }
-      .principles { padding: 68px 0; }
-      .principles-top { display: block; margin-bottom: 37px; }
-      .principles-top p { margin-top: 20px; }
-      .feature-grid { grid-template-columns: 1fr 1fr; }
-      .feature { min-height: 185px; padding: 22px 12px 20px 0; }
-      .feature + .feature { padding-left: 12px; }
-      .feature:nth-child(2n + 1) { border-left: 0; padding-left: 0; }
-      .feature h3 { font-size: 20px; }
-      .download-section { padding: 60px 0; }
+    .skip-link:focus { transform: translateY(0); }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--muted);
+      font: 10px var(--mono);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      width: 22px;
+      height: 1px;
+      background: var(--orange);
+      content: "";
+    }
+
+    /* The hero borrows the reference's bold, centered composition while showing
+       ChainedMac's own menu-bar popover and window strip. */
+    .hero {
+      position: relative;
+      isolation: isolate;
+      min-height: 970px;
+      overflow: hidden;
+      padding: 23px 0 145px;
+      background:
+        radial-gradient(ellipse at 51% 10%, var(--lavender-light) 0, transparent 42%),
+        radial-gradient(ellipse at 11% 47%, #d8c8f7 0, transparent 43%),
+        linear-gradient(133deg, #aa8bdd 0%, var(--lavender) 48%, #ded2f8 100%);
+    }
+    .hero::before {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background-image:
+        radial-gradient(ellipse at 87% 40%, #fffaff38 0 10%, transparent 38%),
+        radial-gradient(ellipse at 28% 13%, #fffaff4d 0 5%, transparent 34%),
+        repeating-linear-gradient(117deg, #371b6508 0 1px, transparent 1px 5px);
+      content: "";
+      pointer-events: none;
+    }
+    .hero::after {
+      position: absolute;
+      right: -10%;
+      bottom: -1px;
+      left: -10%;
+      z-index: 2;
+      height: 247px;
+      background: var(--paper);
+      clip-path: ellipse(96% 102% at 50% 102%);
+      content: "";
+      pointer-events: none;
+    }
+    .nav-pill {
+      position: relative;
+      z-index: 8;
+      display: flex;
+      width: min(920px, calc(100% - 48px));
+      min-height: 62px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin: 0 auto;
+      padding: 8px 10px 8px 19px;
+      border: 1px solid #fffdf0b8;
+      border-radius: 999px;
+      background: #fffdf1ed;
+      box-shadow: 0 8px 28px #3a236b20, inset 0 1px 0 #fff;
+      backdrop-filter: blur(18px);
+    }
+    .brand {
+      display: inline-flex;
+      min-width: max-content;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -.04em;
+    }
+    .brand img { display: block; width: 17px; height: 24px; }
+    .nav-links { display: flex; align-items: center; gap: 26px; color: #625b4f; font-size: 11px; }
+    .nav-links a { transition: color .18s ease; }
+    .nav-links a:hover { color: var(--purple); }
+    .nav-cta {
+      display: inline-flex;
+      min-height: 42px;
+      min-width: 110px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 17px;
+      border-radius: 999px;
+      background: var(--purple-dark);
+      color: white;
+      font-size: 11px;
+      font-weight: 650;
+      transition: transform .2s ease, background .2s ease;
+    }
+    .nav-cta:hover, .hero-cta:hover { transform: translateY(-2px); background: var(--purple); }
+    .nav-cta .ui-icon { width: 14px; height: 14px; }
+    .hero-copy {
+      position: relative;
+      z-index: 4;
+      max-width: 830px;
+      margin: 53px auto 0;
+      padding: 0 22px;
+      text-align: center;
+      animation: arrive .8s both;
+    }
+    .hero-copy .eyebrow { color: #432c70; }
+    .hero-copy .eyebrow::before { background: var(--purple); }
+    .hero h1 {
+      margin: 18px 0 14px;
+      color: #351168;
+      font: 400 clamp(56px, 7vw, 92px)/.88 var(--serif);
+      letter-spacing: -.065em;
+    }
+    .hero-copy > p {
+      max-width: 520px;
+      margin: 0 auto;
+      color: #493566;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .hero-wordmark {
+      position: absolute;
+      top: 300px;
+      left: 50%;
+      z-index: 1;
+      width: 100%;
+      overflow: hidden;
+      color: #fffaffc9;
+      font: 400 clamp(130px, 24vw, 345px)/.8 var(--serif);
+      letter-spacing: -.105em;
+      text-align: center;
+      white-space: nowrap;
+      transform: translateX(-52%);
+      pointer-events: none;
+      user-select: none;
+    }
+    .hero-preview {
+      position: relative;
+      z-index: 4;
+      width: min(1120px, calc(100% - 64px));
+      margin: 58px auto 0;
+      border: 1px solid #fff;
+      border-radius: 18px;
+      background: #fdfbf4;
+      box-shadow: 0 30px 80px #3d286b2e, 0 3px 9px #3d286b1c;
+      animation: rise .9s .12s both;
+      transform: rotate(-.35deg);
+    }
+    .browser-chrome {
+      display: flex;
+      height: 45px;
+      align-items: center;
+      gap: 7px;
+      padding: 0 16px;
+      border-bottom: 1px solid #e6e1d7;
+      border-radius: 17px 17px 0 0;
+      background: #f6f3eb;
+    }
+    .traffic { display: flex; gap: 5px; }
+    .traffic i { width: 8px; height: 8px; border-radius: 50%; background: #e75a55; }
+    .traffic i:nth-child(2) { background: #e8b848; }
+    .traffic i:nth-child(3) { background: #63ae70; }
+    .browser-address {
+      display: flex;
+      width: min(300px, 42%);
+      height: 25px;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin: 0 auto;
+      border: 1px solid #e6e1d7;
+      border-radius: 6px;
+      background: #fffefa;
+      color: #837b6e;
+      font: 9px var(--mono);
+    }
+    .address-lock { width: 6px; height: 7px; border: 1px solid #8a8175; border-radius: 2px; }
+    .chrome-action { color: #81796e; font-size: 11px; }
+    .mock-content {
+      display: grid;
+      min-height: 360px;
+      grid-template-columns: minmax(0, 1fr) 238px;
+      gap: 15px;
+      padding: 16px;
+      background:
+        radial-gradient(ellipse at 40% 12%, #efe9f9 0, transparent 48%),
+        #fbfaf6;
+    }
+    .mock-workspace { min-width: 0; }
+    .mock-workspace-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 1px 1px 12px;
+      color: #837c70;
+      font: 8px var(--mono);
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+    .mock-workspace-label strong { color: #3c314d; font-weight: 500; }
+    .mock-window-row { display: flex; min-width: 0; gap: 9px; }
+    .mock-window {
+      min-width: 0;
+      height: 265px;
+      flex: 1 1 0;
+      overflow: hidden;
+      border: 1px solid #dedbd3;
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 6px 17px #27202b0e;
+      cursor: pointer;
+      transition: border-color .2s ease, box-shadow .25s ease, transform .25s ease;
+    }
+    .mock-window.focused {
+      border: 2px solid var(--purple);
+      box-shadow: 0 9px 27px #5b21b63a;
+      transform: translateY(-5px);
+    }
+    .mock-window:hover:not(.focused), .mock-window:focus-visible { border-color: #a98cdd; transform: translateY(-3px); }
+    .mock-window:focus-visible { outline: 2px solid #7b4cc3; outline-offset: 3px; }
+    .mock-window.is-changing { animation: focusPulse .46s ease both; }
+    .mock-window-row.is-arranging .mock-window { animation: settleIntoStrip .44s cubic-bezier(.2,.8,.2,1) both; }
+    .mock-window-row.is-arranging .mock-window:nth-child(2) { animation-delay: 45ms; }
+    .mock-window-row.is-arranging .mock-window:nth-child(3) { animation-delay: 90ms; }
+    .mock-window-head {
+      display: flex;
+      height: 27px;
+      align-items: center;
+      gap: 4px;
+      padding: 0 8px;
+      border-bottom: 1px solid #ebe8e1;
+      background: #f7f6f1;
+    }
+    .mock-window-head i { width: 5px; height: 5px; border-radius: 50%; background: #d8d2c7; }
+    .mock-window-head i:first-child { background: #e98171; }
+    .mock-window-head i:nth-child(2) { background: #e8bd5a; }
+    .mock-window-head i:nth-child(3) { background: #77b580; }
+    .mock-window-head span {
+      flex: 1;
+      overflow: hidden;
+      padding: 0 6px;
+      color: #797266;
+      font: 7px var(--mono);
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .mock-window-body { padding: 16px 13px; }
+    .mini-eyebrow { margin-bottom: 9px; color: #999286; font: 7px var(--mono); letter-spacing: .1em; }
+    .mini-title { margin: 0 0 8px; color: #282330; font: 19px/1.03 var(--serif); letter-spacing: -.04em; }
+    .mini-text { margin: 0; color: #777169; font-size: 8px; line-height: 1.55; }
+    .mini-lines { display: grid; gap: 5px; margin-top: 13px; }
+    .mini-lines i { display: block; width: 92%; height: 4px; border-radius: 4px; background: #edeae3; }
+    .mini-lines i:nth-child(2) { width: 72%; }
+    .mini-lines i:nth-child(3) { width: 83%; }
+    .mini-code { display: grid; grid-template-columns: 17px 1fr; gap: 2px 6px; color: #615a68; font: 7px/1.65 var(--mono); }
+    .mini-code em { color: var(--purple); font-style: normal; }
+    .mini-calendar { display: grid; gap: 7px; margin-top: 13px; }
+    .mini-calendar div { display: flex; gap: 7px; padding: 6px; border-radius: 4px; background: #f5f2fb; color: #5a5266; font-size: 7px; }
+    .mini-calendar b { color: var(--purple); font: 7px var(--mono); }
+    .popover-card {
+      align-self: center;
+      padding: 15px;
+      border: 1px solid #ebe4d6;
+      border-radius: 11px;
+      background: #fffefa;
+      box-shadow: 0 9px 27px #33223813;
+      transform: translateY(5px);
+    }
+    .popover-brand { display: flex; align-items: center; gap: 8px; }
+    .popover-brand img { width: 14px; height: 20px; }
+    .popover-brand strong { color: #2a2530; font-size: 8px; letter-spacing: .13em; }
+    .popover-state { margin: 2px 0 13px 22px; color: #777267; font-size: 9px; }
+    .popover-separator { height: 1px; margin-bottom: 11px; background: #ebe6dc; }
+    .popover-main-action {
+      display: flex;
+      width: 100%;
+      min-height: 36px;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 0;
+      border-radius: 7px;
+      background: var(--orange);
+      color: white;
+      font-size: 9px;
+      font-weight: 700;
+      transition: background .18s ease, transform .18s ease;
+    }
+    .popover-main-action:hover { background: #db4b2a; transform: translateY(-1px); }
+    .popover-shortcuts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+    .popover-shortcuts button {
+      display: flex;
+      min-height: 29px;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 0 4px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      background: #f6f4ef;
+      color: #48433d;
+      font-size: 8px;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .popover-shortcuts button:hover { border-color: #c4afea; background: #f2ecff; transform: translateY(-1px); }
+    .popover-shortcuts kbd { color: #80786c; font: 8px var(--mono); }
+    .popover-restore {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      margin-top: 10px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #7b7468;
+      font-size: 8px;
+      text-align: left;
+    }
+    .popover-restore:hover { color: var(--purple); }
+    .mock-rail {
+      display: flex;
+      height: 34px;
+      align-items: center;
+      gap: 5px;
+      margin-top: 13px;
+      padding: 0 2px;
+    }
+    .mock-rail span { height: 7px; flex: 1; border-radius: 99px; background: #ddd8cd; }
+    .mock-rail span.is-active { background: var(--purple); transform: scaleY(1.35); }
+    .mock-rail small { margin-left: 5px; color: #766d7f; font: 8px var(--mono); white-space: nowrap; }
+    .mock-tip { display: flex; align-items: center; gap: 6px; margin: -2px 1px 0; color: #6e6677; font: 9px var(--mono); }
+    .mock-tip .ui-icon { width: 14px; height: 14px; color: var(--purple); }
+    .hero-bottom {
+      position: absolute;
+      right: 0;
+      bottom: 36px;
+      left: 0;
+      z-index: 6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+    .hero-cta {
+      display: inline-flex;
+      min-height: 49px;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 0 30px;
+      border-radius: 999px;
+      background: var(--purple-dark);
+      color: white;
+      font-size: 12px;
+      font-weight: 650;
+      box-shadow: 0 7px 18px #241b3225;
+      transition: transform .2s ease, background .2s ease;
+    }
+    .hero-cta .ui-icon { width: 16px; height: 16px; }
+    .hero-availability { color: #493566; font-size: 10px; letter-spacing: .02em; }
+
+    .intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: end;
+      padding: 94px 0 77px;
+    }
+    .intro h2, .section-title {
+      margin: 17px 0 0;
+      color: var(--ink);
+      font: 400 clamp(40px, 5vw, 68px)/.94 var(--serif);
+      letter-spacing: -.055em;
+    }
+    .intro-copy { max-width: 430px; justify-self: end; }
+    .intro-copy p { margin: 0 0 19px; color: var(--muted); font-size: 13px; line-height: 1.8; }
+    .shortcut-note { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; color: #615a68; font: 10px var(--mono); }
+    kbd {
+      display: inline-block;
+      padding: 4px 7px;
+      border: 1px solid #dcd4c7;
+      border-radius: 5px;
+      background: #fffefa;
+      color: var(--ink);
+      font: 10px var(--mono);
+      box-shadow: 0 1px 0 #dcd4c7;
+    }
+
+    .features { padding: 26px 0 102px; }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .feature-card {
+      min-height: 255px;
+      padding: 23px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: linear-gradient(145deg, #fffefa, #f8f4eb);
+      transition: transform .25s ease, box-shadow .25s ease;
+    }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 25px #3322380b; }
+    .feature-visual {
+      display: flex;
+      height: 72px;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 16px;
+    }
+    .feature-bar { height: 37px; flex: 1; border: 1px solid #ded8cb; border-radius: 6px; background: #fff; }
+    .feature-bar.focused { height: 48px; border: 2px solid var(--orange); background: #fffaf4; }
+    .feature-key {
+      display: inline-flex;
+      width: 29px;
+      height: 29px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #ded8cb;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--purple);
+      font: 12px var(--mono);
+    }
+    .feature-key .ui-icon { width: 14px; height: 14px; }
+    .feature-restore {
+      display: flex;
+      width: 48px;
+      height: 48px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #ded8cb;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--purple);
+    }
+    .feature-restore .ui-icon { width: 20px; height: 20px; }
+    .feature-card .number { color: var(--purple); font: 9px var(--mono); letter-spacing: .12em; }
+    .feature-card h3 { margin: 10px 0 8px; font: 23px/1.05 var(--serif); font-weight: 400; letter-spacing: -.03em; }
+    .feature-card p { max-width: 330px; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.65; }
+
+    .demo-section {
+      padding: 94px 0 100px;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 84% 7%, #4a2d6a 0, transparent 39%),
+        var(--plum);
+      color: #fcf8ed;
+    }
+    .demo-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 36px;
+      margin-bottom: 31px;
+    }
+    .demo-heading .eyebrow { color: #c5b8ce; }
+    .demo-heading h2 {
+      margin: 17px 0 0;
+      color: #fffaf1;
+      font: 400 clamp(42px, 5.5vw, 72px)/.92 var(--serif);
+      letter-spacing: -.06em;
+    }
+    .demo-heading p { max-width: 310px; margin: 0 0 4px; color: #c1b6c8; font-size: 11px; line-height: 1.75; }
+    .demo-frame {
+      overflow: hidden;
+      border: 1px solid #ffffff28;
+      border-radius: 16px;
+      background: #f8f6ef;
+      box-shadow: 0 25px 60px #110d194a;
+      color: var(--ink);
+    }
+    .demo-chrome {
+      display: flex;
+      height: 45px;
+      align-items: center;
+      gap: 7px;
+      padding: 0 15px;
+      border-bottom: 1px solid #e6e0d6;
+      background: #f1eee7;
+    }
+    .demo-chrome .traffic i { width: 7px; height: 7px; }
+    .demo-url { margin: 0 auto; color: #898275; font: 8px var(--mono); }
+    .demo-live { display: flex; align-items: center; gap: 6px; color: #817969; font: 8px var(--mono); }
+    .demo-live i { width: 6px; height: 6px; border-radius: 50%; background: #79a85f; }
+    .demo-viewport {
+      position: relative;
+      height: 385px;
+      overflow: auto hidden;
+      outline: none;
+      background:
+        radial-gradient(ellipse at 55% 35%, #fff 0, transparent 45%),
+        linear-gradient(140deg, #f8f5ec, #eeeaf4);
+      scrollbar-width: none;
+      touch-action: pan-x pan-y;
+    }
+    .demo-viewport::-webkit-scrollbar { display: none; }
+    .demo-strip {
+      position: relative;
+      display: flex;
+      min-width: max-content;
+      height: 100%;
+      align-items: center;
+      gap: 13px;
+      padding: 38px;
+      transition: transform .35s ease;
+    }
+    .demo-window {
+      position: relative;
+      width: var(--window-width, 300px);
+      height: 286px;
+      flex: 0 0 var(--window-width, 300px);
+      overflow: hidden;
+      border: 1px solid #dedad1;
+      border-radius: 10px;
+      background: #fffefa;
+      box-shadow: 0 11px 30px #21192d18;
+      transition: width .28s ease, flex-basis .28s ease, transform .28s ease, border-color .2s ease, opacity .2s ease;
+    }
+    .demo-window.is-focused { z-index: 2; border: 2px solid var(--orange); transform: translateY(-5px); }
+    .demo-window-head {
+      display: flex;
+      height: 34px;
+      align-items: center;
+      gap: 5px;
+      padding: 0 10px;
+      border-bottom: 1px solid #eae6de;
+      background: #f5f2ec;
+    }
+    .demo-window-head i { width: 7px; height: 7px; border-radius: 50%; background: #d8d2c7; }
+    .demo-window-head i:first-child { background: #e98171; }
+    .demo-window-head i:nth-child(2) { background: #e8bd5a; }
+    .demo-window-head i:nth-child(3) { background: #77b580; }
+    .demo-window-head span { flex: 1; overflow: hidden; padding: 0 20px; color: #797266; font: 8px var(--mono); text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+    .demo-window-body { padding: 22px 23px; }
+    .demo-window-body .tag { margin-bottom: 14px; color: #938c80; font: 8px var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+    .demo-window-body h3 { max-width: 250px; margin: 0 0 10px; color: #30283a; font: 28px/1.02 var(--serif); font-weight: 400; letter-spacing: -.045em; }
+    .demo-window-body p { max-width: 250px; margin: 0; color: #7d766b; font-size: 10px; line-height: 1.65; }
+    .demo-lines { display: grid; gap: 6px; margin-top: 20px; }
+    .demo-lines i { width: 90%; height: 5px; border-radius: 4px; background: #ebe7df; }
+    .demo-lines i:nth-child(2) { width: 72%; }
+    .demo-lines i:nth-child(3) { width: 82%; }
+    .demo-code { display: grid; grid-template-columns: 20px 1fr; gap: 2px 7px; color: #635c6b; font: 9px/1.8 var(--mono); }
+    .demo-code b { color: var(--purple); font-weight: 500; }
+    .demo-event { display: grid; gap: 8px; margin-top: 18px; }
+    .demo-event div { display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 5px; background: #f3eff9; color: #5f566c; font-size: 8px; }
+    .demo-event strong { color: var(--purple); font: 8px var(--mono); }
+    .demo-bottom {
+      display: flex;
+      min-height: 63px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 10px 16px;
+      border-top: 1px solid #e6e0d6;
+      background: #f4f1ea;
+    }
+    .demo-status { display: flex; align-items: center; gap: 11px; color: #777164; font: 9px var(--mono); }
+    .demo-status strong { color: var(--ink); font-weight: 600; }
+    .demo-status .pip { width: 7px; height: 7px; border-radius: 50%; background: #7fa666; }
+    .demo-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+    .demo-button {
+      display: inline-flex;
+      min-height: 32px;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 10px;
+      border: 1px solid #ddd6ca;
+      border-radius: 6px;
+      background: #fffefa;
+      color: #4a4252;
+      font-size: 9px;
+      transition: border .18s ease, background .18s ease, transform .18s ease;
+    }
+    .demo-button .ui-icon { width: 14px; height: 14px; }
+    .demo-button:hover { border-color: var(--purple); transform: translateY(-1px); }
+    .demo-button.primary { border-color: var(--purple); background: var(--purple); color: #fff; }
+    .demo-button.primary:hover { background: var(--purple-dark); }
+    .demo-hint { display: flex; justify-content: space-between; gap: 15px; margin-top: 13px; color: #b7abbf; font: 8px var(--mono); }
+    .demo-hint span { display: inline-flex; align-items: center; gap: 5px; }
+
+    .download-section { position: relative; padding: 102px 0 92px; overflow: hidden; background: var(--paper-warm); }
+    .download-section::after {
+      position: absolute;
+      right: -30px;
+      bottom: -99px;
+      color: #5b21b60c;
+      content: "Chained";
+      font: 400 clamp(150px, 23vw, 310px)/.8 var(--serif);
+      letter-spacing: -.09em;
+      pointer-events: none;
+    }
+    .download-inner { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 55px; align-items: end; }
+    .download-inner h2 { max-width: 600px; margin: 17px 0 13px; font: 400 clamp(46px, 6vw, 76px)/.9 var(--serif); letter-spacing: -.065em; }
+    .download-inner p { max-width: 465px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.75; }
+    .download-options { display: grid; gap: 9px; }
+    .download-option {
+      display: flex;
+      min-height: 69px;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 14px;
+      border: 1px solid #ddd4c4;
+      border-radius: 11px;
+      background: #fffefa;
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+    .download-option:hover { transform: translateY(-2px); border-color: var(--purple); box-shadow: 0 6px 18px #28193710; }
+    .download-platform-icon {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      place-items: center;
+      border-radius: 10px;
+      background: #f4eefb;
+      color: var(--purple);
+      font-size: 17px;
+    }
+    .download-platform-icon img { display: block; width: 22px; height: 22px; object-fit: contain; }
+    .download-option:nth-child(2) .download-platform-icon { background: #fff0e9; color: var(--orange); }
+    .download-label { flex: 1; }
+    .download-label strong { display: block; color: var(--ink); font-size: 11px; }
+    .download-label small { display: block; margin-top: 4px; color: #80796d; font-size: 9px; }
+    .download-arrow { display: inline-flex; color: #6b6375; }
+    .download-arrow .ui-icon { width: 17px; height: 17px; }
+    .download-footnote { margin-top: 13px !important; font: 9px/1.6 var(--mono) !important; }
+
+    .faq-section { padding: 90px 0 96px; background: var(--paper); }
+    .faq-layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 48px; align-items: start; }
+    .faq-copy h2 { margin: 0; color: var(--ink); font: 600 36px/1.15 var(--sans); letter-spacing: -.04em; }
+    .faq-copy > p { max-width: 380px; margin: 16px 0 0; color: var(--muted); font: 400 18px/1.5 var(--sans); }
+    .faq-contact { margin-top: 24px !important; font-size: 14px !important; line-height: 1.6 !important; }
+    .faq-contact a { color: var(--purple); font-weight: 600; text-underline-offset: 3px; }
+    .faq-list { border-top: 1px solid var(--line); }
+    .faq-item { border-bottom: 1px solid var(--line); }
+    .faq-item h3 { margin: 0; font: inherit; }
+    .faq-trigger { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 18px; padding: 18px 0; border: 0; background: transparent; color: var(--ink); cursor: pointer; font: 500 16px/1.45 var(--sans); text-align: left; }
+    .faq-trigger:hover { color: var(--purple); }
+    .faq-trigger:focus-visible { outline: 2px solid var(--purple); outline-offset: 4px; }
+    .faq-chevron { width: 10px; height: 10px; flex: 0 0 auto; margin: 0 5px 5px 0; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); transition: transform .2s ease; }
+    .faq-item.is-open .faq-chevron { margin-bottom: -5px; transform: rotate(225deg); }
+    .faq-answer { display: grid; grid-template-rows: 0fr; overflow: hidden; opacity: 0; transition: grid-template-rows .45s ease, opacity .25s ease; }
+    .faq-answer[hidden] { display: none; }
+    .faq-answer-inner { min-height: 0; overflow: hidden; padding: 0; transition: padding .25s ease; }
+    .faq-item.is-open .faq-answer { grid-template-rows: 1fr; opacity: 1; }
+    .faq-item.is-open .faq-answer-inner { padding: 0 40px 20px 0; }
+    .faq-answer-text { margin: 0; color: var(--muted); font: 400 16px/1.65 var(--sans); overflow-wrap: anywhere; white-space: normal; }
+    .faq-char { display: inline-block; opacity: 0; filter: blur(10px); transform: translateY(2px); transition: opacity .3s ease, filter .3s ease, transform .3s ease; transition-delay: var(--char-delay); }
+    .faq-item.is-open .faq-char { opacity: 1; filter: blur(0); transform: translateY(0); }
+    .faq-item.is-closing .faq-char { transition-delay: var(--char-reverse-delay); }
+
+    .footer {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      width: min(1440px, 100%);
+      height: 592px;
+      margin: 0 auto;
+      border-top: 1px solid #eee9e2;
+      background: #f5f5f5;
+      color: #666;
+    }
+    .footer .shell {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+    .footer-grid {
+      position: absolute;
+      top: 104px;
+      left: 50%;
+      display: grid;
+      width: min(75.7vw, 1090px);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 31px;
+      transform: translateX(-50%);
+    }
+    .footer-column { display: flex; min-width: 0; flex-direction: column; gap: 12px; }
+    .footer-column h2 {
+      margin: 0;
+      color: #000;
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: -.48px;
+      line-height: 1.5;
+      text-transform: lowercase;
+    }
+    .footer-column > a {
+      display: block;
+      width: fit-content;
+      margin: 0;
+      color: #0009;
+      font-size: 16px;
+      letter-spacing: -.48px;
+      line-height: 1.5;
+      text-decoration: none;
+      transition: color .15s ease;
+    }
+    .footer-column > a:hover { color: #000; }
+    .footer-disclaimer p {
+      max-width: 249px;
+      margin: 0;
+      color: #0009;
+      font-size: 16px;
+      letter-spacing: -.48px;
+      line-height: 1.5;
+    }
+    .footer-mark {
+      position: absolute;
+      top: 260px;
+      left: 50%;
+      width: min(79.1vw, 1139px);
+      aspect-ratio: 3.83 / 1;
+      overflow: hidden;
+      transform: translateX(-50%);
+      line-height: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+    .footer-mark-static {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      filter: hue-rotate(20deg);
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
+    }
+    .footer-decor {
+      position: absolute;
+      z-index: 2;
+      width: 75px;
+      height: 75px;
+      object-fit: contain;
+    }
+    .footer-trash { top: 313px; left: 20px; pointer-events: none; }
+    .footer-folder-btn {
+      top: 289px;
+      right: max(20px, calc((100% - 1440px) / 2 + 73px));
+      display: block;
+      pointer-events: auto;
+      line-height: 0;
+      transition: transform .2s ease;
+    }
+    .footer-folder-btn:hover { transform: translateY(-5px) rotate(3deg); }
+    .footer-folder-btn img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: hue-rotate(70deg) saturate(1.12);
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
+    }
+    .footer-copy {
+      position: absolute;
+      bottom: 18px;
+      left: 0;
+      z-index: 2;
+      width: 100%;
+      margin: 0;
+      color: #00000073;
+      font-size: 12px;
+      letter-spacing: -.24px;
+      line-height: 16px;
+      text-align: center;
+    }
+
+    @keyframes arrive { from { opacity: 0; transform: translateY(13px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes rise { from { opacity: 0; transform: translateY(20px) rotate(-.35deg); } to { opacity: 1; transform: translateY(0) rotate(-.35deg); } }
+    @keyframes focusPulse {
+      0%, 100% { box-shadow: 0 9px 27px #5b21b63a; }
+      45% { box-shadow: 0 0 0 5px #5b21b625, 0 14px 34px #5b21b645; }
+    }
+    @keyframes settleIntoStrip {
+      from { opacity: .65; transform: translateY(12px) scale(.985); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @media (max-width: 900px) {
+      .hero { min-height: 900px; }
+      .hero-preview { margin-top: 48px; }
+      .mock-content { grid-template-columns: minmax(0, 1fr) 205px; gap: 10px; padding: 12px; }
+      .mock-window-row { gap: 6px; }
+      .mock-window { height: 255px; }
+      .mock-window-body { padding: 13px 9px; }
+      .popover-card { padding: 12px; }
+      .feature-grid { gap: 9px; }
+      .feature-card { padding: 18px; }
+      .demo-bottom { align-items: flex-start; flex-direction: column; }
+      .download-inner { gap: 34px; }
+      .faq-layout { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 36px; }
+      .footer { width: 100%; height: auto; min-height: 640px; padding: 76px 0 22px; }
+      .footer .shell { display: flex; width: min(100% - 40px, 700px); height: auto; flex-direction: column; margin: 0 auto; }
+      .footer-grid { position: static; width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 30px; transform: none; }
+      .footer-column { display: flex; flex-direction: column; gap: 12px; }
+      .footer-column h2 { margin: 0; }
+      .footer-column > a { margin: 0; }
+      .footer-decor { display: none; }
+      .footer-mark { position: relative; top: auto; left: auto; width: min(100%, 900px); height: auto; margin: 58px auto 0; transform: none; }
+      .footer-copy { position: static; margin-top: 18px; }
+    }
+    @media (max-width: 680px) {
+      .shell { width: min(100% - 34px, 520px); }
+      .hero { min-height: 840px; padding-top: 15px; }
+      .nav-pill { width: calc(100% - 24px); min-height: 54px; gap: 10px; padding: 6px 7px 6px 13px; }
+      .brand { font-size: 11px; gap: 7px; }
+      .brand img { width: 14px; height: 20px; }
+      .nav-links { gap: 12px; font-size: 9px; }
+      .nav-links a:first-child { display: none; }
+      .nav-cta { min-width: 84px; min-height: 38px; padding: 0 11px; font-size: 9px; }
+      .hero-copy { margin-top: 48px; padding: 0 18px; }
+      .hero h1 { font-size: clamp(49px, 12.4vw, 72px); }
+      .hero-copy > p { max-width: 380px; font-size: 11px; }
+      .hero-wordmark { top: 291px; font-size: 26vw; }
+      .hero-preview { width: calc(100% - 30px); margin-top: 43px; border-radius: 12px; }
+      .browser-chrome { height: 35px; padding: 0 10px; }
+      .browser-address { height: 21px; font-size: 7px; }
+      .chrome-action { font-size: 9px; }
+      .mock-content { display: block; min-height: 264px; padding: 10px; }
+      .mock-workspace-label { margin-bottom: 9px; font-size: 7px; }
+      .mock-window-row { gap: 6px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+      .mock-window-row::-webkit-scrollbar { display: none; }
+      .mock-window { height: 186px; flex: 0 0 42%; }
+      .mock-window-head { height: 23px; padding: 0 5px; }
+      .mock-window-head i { width: 4px; height: 4px; }
+      .mock-window-head span { padding: 0 3px; font-size: 6px; }
+      .mock-window-body { padding: 12px 8px; }
+      .mini-eyebrow { margin-bottom: 7px; font-size: 6px; }
+      .mini-title { font-size: 16px; }
+      .mini-text { font-size: 7px; }
+      .popover-card { display: none; }
+      .mock-rail { height: 21px; margin-top: 7px; }
+      .mock-rail span { height: 5px; }
+      .hero::after { height: 190px; }
+      .hero-bottom { bottom: 23px; }
+      .hero-cta { min-height: 45px; font-size: 10px; }
+      .hero-availability { font-size: 8px; }
+      .intro { display: block; padding: 68px 0 42px; }
+      .intro h2 { font-size: 49px; }
+      .intro-copy { margin-top: 23px; }
+      .intro-copy p { font-size: 11px; }
+      .features { padding: 28px 0 70px; }
+      .feature-grid { grid-template-columns: 1fr; gap: 8px; margin-top: 23px; }
+      .feature-card { min-height: 0; padding: 17px; }
+      .feature-visual { height: 56px; margin-bottom: 12px; }
+      .feature-card h3 { font-size: 21px; }
+      .feature-card p { font-size: 10px; }
+      .demo-section { padding: 68px 0 72px; }
+      .demo-heading { display: block; margin-bottom: 23px; }
+      .demo-heading h2 { font-size: 50px; }
+      .demo-heading p { margin-top: 16px; }
+      .demo-chrome { height: 37px; }
+      .demo-url { font-size: 7px; }
+      .demo-live { font-size: 7px; }
+      .demo-viewport { height: 318px; }
+      .demo-strip { padding: 25px 15px; gap: 9px; }
+      .demo-window { height: 248px; }
+      .demo-window-body { padding: 18px 16px; }
+      .demo-window-body h3 { font-size: 25px; }
+      .demo-bottom { padding: 12px; }
+      .demo-actions { width: 100%; }
+      .demo-button { flex: 1 1 28%; min-height: 36px; padding: 0 7px; font-size: 8px; }
+      .demo-hint { flex-direction: column; font-size: 7px; }
+      .download-section { padding: 70px 0 58px; }
       .download-inner { display: block; }
-      .download-actions { margin-top: 26px; }
-      .footer { align-items: flex-start; gap: 18px; }
-      .footer-links { gap: 11px; flex-wrap: wrap; justify-content: flex-end; }
+      .download-inner h2 { font-size: 57px; }
+      .download-options { margin-top: 25px; }
+      .faq-section { padding: 64px 0 70px; }
+      .faq-layout { display: block; }
+      .faq-copy h2 { font-size: 36px; }
+      .faq-copy > p { font-size: 18px; }
+      .faq-list { margin-top: 32px; }
+      .faq-trigger { gap: 12px; padding: 17px 0; font-size: 16px; }
+      .faq-item.is-open .faq-answer-inner { padding-right: 28px; }
+      .faq-answer-text { font-size: 16px; }
+      .footer { min-height: 0; padding: 62px 0 24px; }
+      .footer .shell { width: min(100% - 34px, 520px); }
+      .footer-grid { gap: 28px 18px; }
+      .footer-column { gap: 10px; }
+      .footer-mark { width: min(100%, 560px); margin-top: 44px; }
+      .footer-copy { margin-top: 16px; }
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      .faq-char { transition-delay: 0ms !important; }
     }
   </style>
 </head>
 <body>
-  <header class="shell topbar">
-    <a class="brand" href="#top" aria-label="ChainYourMac home"><img class="brand-mark" src="./favicon.svg?v=purple-mark" alt=""><span>ChainYourMac</span></a>
-    <nav class="navlinks" aria-label="Main navigation">
-      <a href="#how">How it works</a>
-      <a href="#demo">Try the demo</a>
-      <a class="nav-download" href="#get">Get the app ↗</a>
-    </nav>
-  </header>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-  <main id="top">
-    <section class="shell hero">
-      <div class="hero-copy">
-        <div class="eyebrow">A different kind of window manager</div>
-        <h1>Make room<br>for the <em>work.</em></h1>
-        <p>Your windows have somewhere to go. ChainYourMac lays them in one long, calm strip. Focus one, move along, keep the size you chose on Mac or Windows.</p>
-        <div class="hero-actions">
-          <a class="button button-primary" href="#get">Get ChainYourMac <span aria-hidden="true">↗</span></a>
-          <a class="button button-quiet" href="#demo">Try the little demo <span aria-hidden="true">↓</span></a>
-        </div>
-        <p class="hero-note">MACOS 13+ &nbsp;·&nbsp; APPLE SILICON + INTEL &nbsp;·&nbsp; WINDOWS X64</p>
+  <!-- Untitled UI free line icons, embedded from https://www.untitledui.com/resources/icons -->
+  <svg class="icon-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <symbol id="uui-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5m0 0 7 7m-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="uui-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14m0 0-7-7m7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="uui-arrow-up-right" viewBox="0 0 24 24"><path d="M7 17 17 7m0 0H7m10 0v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="uui-download" viewBox="0 0 24 24"><path d="M21 15v1.2c0 1.68 0 2.52-.327 3.162a3 3 0 0 1-1.311 1.311C18.72 21 17.88 21 16.2 21H7.8c-1.68 0-2.52 0-3.162-.327a3 3 0 0 1-1.311-1.311C3 18.72 3 17.88 3 16.2V15m14-5-5 5m0 0-5-5m5 5V3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="uui-layout" viewBox="0 0 24 24"><path d="M3 9h18M9 9v12M7.8 3h8.4c1.68 0 2.52 0 3.162.327a3 3 0 0 1 1.311 1.311C21 5.28 21 6.12 21 7.8v8.4c0 1.68 0 2.52-.327 3.162a3 3 0 0 1-1.311 1.311C18.72 21 17.88 21 16.2 21H7.8c-1.68 0-2.52 0-3.162-.327a3 3 0 0 1-1.311-1.311C3 18.72 3 17.88 3 16.2V7.8c0-1.68 0-2.52.327-3.162a3 3 0 0 1 1.311-1.311C5.28 3 6.12 3 7.8 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="uui-expand-horizontal" viewBox="0 0 24 24"><path d="M20 17H4m0 0 4 4m-4-4 4-4m12-6H9m0 0 4 4M9 7l4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="uui-center" viewBox="0 0 24 24"><path d="M12 3v18m10-9h-6.5m0 0 4 4m-4-4 4-4M2 12h6.5m0 0-4 4m4-4-4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="uui-refresh" viewBox="0 0 24 24"><path d="M2 10s2.005-2.732 3.634-4.362A9 9 0 1 1 12 21a9.004 9.004 0 0 1-8.648-6.5M2 10V4m0 6h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="uui-click" viewBox="0 0 24 24"><path d="M9 3.5V2M5.06 5.06 4 4m1.06 9L4 14.06m9-9L14.06 4M3.5 9H2m13.864 7.19-2.491 4.627c-.285.529-.427.793-.598.86a.5.5 0 0 1-.451-.044c-.155-.099-.243-.386-.42-.96L8.445 9.445c-.144-.468-.216-.703-.158-.861a.5.5 0 0 1 .297-.297c.158-.058.393.014.861.158l11.228 3.459c.574.177.86.265.96.42a.5.5 0 0 1 .044.45c-.067.172-.331.314-.86.599l-4.627 2.492a1.08 1.08 0 0 0-.153.09.493.493 0 0 0-.082.082 1.08 1.08 0 0 0-.09.153Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="uui-chain" viewBox="0 0 24 24"><path d="m12.708 18.364-1.415 1.414a5 5 0 1 1-7.07-7.07l1.413-1.415m12.728 1.414 1.415-1.414a5 5 0 0 0-7.071-7.071l-1.415 1.414M8.5 15.5l7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <section class="hero" id="top" aria-labelledby="hero-title">
+    <nav class="nav-pill" aria-label="Main navigation">
+      <a class="brand" href="#top" aria-label="ChainedMac home">
+        <img src="./favicon.svg?v=purple-mark" alt="">
+        <span>ChainedMac</span>
+      </a>
+      <div class="nav-links">
+        <a href="#how">How it works</a>
+        <a href="#demo">Try the strip</a>
       </div>
+      <a class="nav-cta" href="#get">Get the app <svg class="ui-icon" aria-hidden="true" focusable="false"><use href="#uui-arrow-up-right"/></svg></a>
+    </nav>
 
-      <div class="stage" aria-label="Illustration of app windows arranged along a horizontal strip">
-        <div class="desktop">
-          <div class="desktop-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span class="desktop-label">MONDAY / OPEN DESKTOP</span></div>
-          <div class="desktop-canvas">
-            <div class="float-window one"><div class="winbar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span class="winname">Untitled — Notes</span></div><div class="paper-content"><div class="paper-kicker">FIELD NOTES / 04</div><div class="paper-head">A thought worth keeping.</div><div class="paper-line"></div><div class="paper-line short"></div></div></div>
-            <div class="float-window two"><div class="winbar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span class="winname">editor.ts — Workbench</span></div><div class="code-content"><span class="line-no">01</span><span><span class="code-orange">const</span> windows = desktop.open;</span><span class="line-no">02</span><span><span class="code-orange">const</span> strip = windows.map(keep);</span><span class="line-no">03</span><span><span class="code-green">// no more shrinking</span></span><span class="line-no">04</span><span>focus(strip.next());</span><span class="line-no">05</span><span>space.for(work);</span><span class="line-no">06</span><span>&nbsp;</span></div></div>
-            <div class="float-window three"><div class="winbar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span class="winname">Today — Safari</span></div><div class="paper-content"><div class="paper-kicker">YOUR CURRENT WINDOW</div><div class="paper-head">One thing, in focus.</div><div class="paper-line"></div><div class="paper-line short"></div><div class="paper-line"></div></div></div>
-            <span class="focus-ribbon">01 / IN FOCUS</span>
-            <div class="strip-rail" aria-hidden="true"><i class="rail-window"></i><i class="rail-window"></i><i class="rail-window active"></i><i class="rail-window"></i><i class="rail-window"></i><i class="rail-window"></i><i class="rail-window"></i></div>
+    <div class="hero-copy">
+      <div class="eyebrow">A calmer way across your desktop</div>
+      <h1 id="hero-title">Make room for<br>the work.</h1>
+      <p>Keep the apps you already use in one long, calm strip. Focus the next window without losing the size you chose.</p>
+    </div>
+
+    <div class="hero-wordmark" aria-hidden="true">Chained</div>
+
+    <figure class="hero-preview" aria-label="Interactive ChainedMac preview. Choose a window or press Shift with the left or right arrow key to move focus.">
+      <div class="browser-chrome">
+        <span class="traffic" aria-hidden="true"><i></i><i></i><i></i></span>
+        <div class="browser-address"><span class="address-lock" aria-hidden="true"></span> desktop / in-focus</div>
+        <svg class="ui-icon small chrome-action" aria-hidden="true" focusable="false"><use href="#uui-arrow-up-right"/></svg>
+      </div>
+      <div class="mock-content">
+        <div class="mock-workspace">
+          <div class="mock-workspace-label"><strong>MONDAY / OPEN DESKTOP</strong><span>03 WINDOWS</span></div>
+          <div class="mock-window-row">
+            <article class="mock-window" data-hero-window-index="0" role="button" tabindex="0" aria-label="Focus Notes window" aria-pressed="false">
+              <div class="mock-window-head"><i></i><i></i><i></i><span>Launch notes — Draft</span></div>
+              <div class="mock-window-body">
+                <div class="mini-eyebrow">FIELD NOTES / 04</div>
+                <h2 class="mini-title">A thought worth keeping.</h2>
+                <p class="mini-text">The first good idea often arrives between two other things.</p>
+                <div class="mini-lines" aria-hidden="true"><i></i><i></i><i></i></div>
+              </div>
+            </article>
+            <article class="mock-window focused" data-hero-window-index="1" role="button" tabindex="0" aria-label="Focus Code window" aria-pressed="true">
+              <div class="mock-window-head"><i></i><i></i><i></i><span>WindowStrip.swift — Code</span></div>
+              <div class="mock-window-body">
+                <div class="mini-eyebrow">CHAINEDMAC / SOURCE</div>
+                <div class="mini-code" aria-label="Example code in the focused window">
+                  <span>01</span><span><em>let</em> windows = openApps</span>
+                  <span>02</span><span><em>let</em> strip = windows.inLine</span>
+                  <span>03</span><span>focus(strip.next)</span>
+                  <span>04</span><span>makeRoom(for: work)</span>
+                  <span>05</span><span>&nbsp;</span>
+                </div>
+              </div>
+            </article>
+            <article class="mock-window" data-hero-window-index="2" role="button" tabindex="0" aria-label="Focus Calendar window" aria-pressed="false">
+              <div class="mock-window-head"><i></i><i></i><i></i><span>Today — Calendar</span></div>
+              <div class="mock-window-body">
+                <div class="mini-eyebrow">YOUR AFTERNOON</div>
+                <h2 class="mini-title">One thing, in focus.</h2>
+                <div class="mini-calendar" aria-hidden="true">
+                  <div><b>2:00</b><span>Design review</span></div>
+                  <div><b>3:30</b><span>Walk + reset</span></div>
+                  <div><b>4:00</b><span>Ship the small thing</span></div>
+                </div>
+              </div>
+            </article>
           </div>
+          <div class="mock-rail" aria-hidden="true">
+            <span data-hero-rail="0"></span><span class="is-active" data-hero-rail="1"></span><span data-hero-rail="2"></span><small id="heroFocusLabel">WINDOW 02 / IN FOCUS</small>
+          </div>
+          <div class="mock-tip"><svg class="ui-icon" aria-hidden="true" focusable="false"><use href="#uui-click"/></svg><span>Click a window or press Shift + ← / →</span></div>
         </div>
-        <div class="dock" aria-hidden="true"><span class="dock-icon">◎</span><span class="dock-icon">⌘</span><span class="dock-icon">›_</span><span class="dock-icon">♫</span><span class="dock-icon">✎</span></div>
-        <div class="stage-caption"><span class="caption-line"></span> ONE STRIP. YOUR WHOLE DESKTOP.</div>
+
+        <aside class="popover-card" aria-label="ChainedMac menu-bar controls">
+          <div class="popover-brand">
+            <img src="./favicon.svg?v=purple-mark" alt="">
+            <strong>CHAINEDMAC</strong>
+          </div>
+          <div class="popover-state" id="heroFocusStatus" aria-live="polite">3 windows in strip · Code in focus</div>
+          <div class="popover-separator"></div>
+          <button class="popover-main-action" type="button" data-hero-action="arrange"><svg class="ui-icon small" aria-hidden="true" focusable="false"><use href="#uui-layout"/></svg><span>Arrange open windows</span></button>
+          <div class="popover-shortcuts">
+            <button type="button" data-hero-action="previous" aria-label="Focus previous window"><svg class="ui-icon small" aria-hidden="true" focusable="false"><use href="#uui-arrow-left"/></svg><span>Previous</span><kbd>⇧←</kbd></button>
+            <button type="button" data-hero-action="next" aria-label="Focus next window"><span>Next</span><svg class="ui-icon small" aria-hidden="true" focusable="false"><use href="#uui-arrow-right"/></svg><kbd>⇧→</kbd></button>
+          </div>
+          <button class="popover-restore" type="button" data-hero-action="restore"><svg class="ui-icon small" aria-hidden="true" focusable="false"><use href="#uui-refresh"/></svg><span>Restore original positions</span><kbd>⌃⌥R</kbd></button>
+        </aside>
+      </div>
+    </figure>
+
+    <div class="hero-bottom">
+      <a class="hero-cta" href="#get">Download ChainedMac <svg class="ui-icon" aria-hidden="true" focusable="false"><use href="#uui-download"/></svg></a>
+      <div class="hero-availability">Available for macOS and Windows</div>
+    </div>
+  </section>
+
+  <main id="main">
+    <section class="intro shell" id="how">
+      <div>
+        <div class="eyebrow">Your desktop, uncompressed</div>
+        <h2>Side by side.<br>At your pace.</h2>
+      </div>
+      <div class="intro-copy">
+        <p>ChainedMac gathers your open windows into a horizontal strip. Move the focus along the line, keep the dimensions you picked, and put your desktop back when you’re done.</p>
+        <div class="shortcut-note" aria-label="Focus shortcut">
+          <span>Move through the strip</span>
+          <kbd>Shift</kbd><kbd>←</kbd><span>or</span><kbd>Shift</kbd><kbd>→</kbd>
+        </div>
       </div>
     </section>
 
-    <section class="shell manifesto" aria-label="Product principles">
-      <p>A workspace should make it easier to think, not ask you to think about it.</p>
-      <p>Side by side. At your pace.</p>
-      <p>01 — ALWAYS YOUR WINDOWS</p>
+    <section class="features shell" aria-label="How ChainedMac works">
+      <div class="feature-grid">
+        <article class="feature-card">
+          <div class="feature-visual" aria-hidden="true">
+            <span class="feature-bar"></span><span class="feature-bar focused"></span><span class="feature-bar"></span><span class="feature-bar"></span>
+          </div>
+          <div class="number">01 / MAKE A STRIP</div>
+          <h3>Keep every window its size.</h3>
+          <p>Arrange the apps you already have open. Their windows stay comfortably readable as the strip grows.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-visual" aria-hidden="true">
+            <span class="feature-key">⇧</span><span class="feature-key"><svg class="ui-icon" aria-hidden="true" focusable="false"><use href="#uui-arrow-left"/></svg></span><span class="feature-key"><svg class="ui-icon" aria-hidden="true" focusable="false"><use href="#uui-arrow-right"/></svg></span>
+          </div>
+          <div class="number">02 / MOVE THROUGH</div>
+          <h3>One key to the next thing.</h3>
+          <p>Use <strong>Shift+Left</strong> and <strong>Shift+Right</strong> to focus the previous or next window while ChainedMac is running.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-visual" aria-hidden="true">
+            <span class="feature-restore"><svg class="ui-icon" aria-hidden="true" focusable="false"><use href="#uui-refresh"/></svg></span><span class="feature-bar"></span><span class="feature-bar"></span>
+          </div>
+          <div class="number">03 / RESET ANYTIME</div>
+          <h3>Return to where you began.</h3>
+          <p>Restore the original window positions in one step. Your apps stay open and right where you left them.</p>
+        </article>
+      </div>
     </section>
 
     <section class="demo-section" id="demo">
       <div class="shell">
-        <div class="section-heading">
-          <div><div class="eyebrow">A small, hands-on preview</div><h2>Take it for a scroll.</h2></div>
-          <p>This browser-only model previews the strip concept. Its sample windows are illustrations; desktop actions are available in the Mac and Windows apps.</p>
-        </div>
-        <div class="sim-shell">
-          <div class="sim-head"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span class="sim-title">CHAINYOURMAC — INTERACTIVE PREVIEW</span><span class="live-tag"><i class="live-pip"></i> CLICK AROUND</span></div>
-          <div class="sim-display" id="simDisplay" tabindex="0" aria-label="Interactive window strip. Use left and right arrow keys to navigate.">
-            <div class="sim-ruler"></div><div class="sim-strip" id="simStrip"></div>
+        <div class="demo-heading">
+          <div>
+            <div class="eyebrow">A small, hands-on preview</div>
+            <h2>Take it for a scroll.</h2>
           </div>
-          <div class="sim-footer"><span><span class="counter" id="focusCounter">01 / 03</span> &nbsp; FOCUSED</span><span class="status-message" id="statusMessage" aria-live="polite">Strip ready. Choose a window.</span></div>
-          <div class="sim-controls">
-            <div class="app-picker">
-              <span class="control-label">Add a window</span>
-              <button class="app-button" data-open="Safari">◎ &nbsp; Safari</button>
-              <button class="app-button" data-open="Terminal">›_ &nbsp; Terminal</button>
-              <button class="app-button" data-open="Notes">✎ &nbsp; Notes</button>
-              <button class="app-button" data-open="Mail">✉ &nbsp; Mail</button>
-              <button class="app-button" data-open="Code">⌘ &nbsp; Code</button>
-              <button class="app-button" data-open="Music">♫ &nbsp; Music</button>
-            </div>
-            <div class="toolbox" aria-label="Window actions">
-              <button class="tool-button" data-action="left" title="Focus previous window (←)">← Prev</button>
-              <button class="tool-button" data-action="right" title="Focus next window (→)">Next →</button>
-              <button class="tool-button" data-action="moveLeft" title="Move focused window left (⇧←)">⇧ Move</button>
-              <button class="tool-button" data-action="width" title="Cycle window width (W)">↔ Width</button>
-              <button class="tool-button" data-action="center" title="Center the focused window (C)">⌖ Center</button>
-              <button class="tool-button" data-action="stack" title="Stack into the previous column (S)">▤ Stack</button>
-              <button class="tool-button" data-action="unstack" title="Pop out a stacked window (⇧S)">↗ Pop out</button>
-              <button class="tool-button" data-action="tabs" title="Toggle tabs on a stack (T)">▱ Tabs</button>
-              <button class="tool-button" data-action="dim" aria-pressed="false">◐ Dim inactive</button>
-            </div>
-          </div>
+          <p>This browser demo uses sample windows to show how the strip feels. Desktop window actions happen in the Mac and Windows apps.</p>
         </div>
-        <div class="shortcuts" aria-label="Keyboard shortcuts">
-          <span><kbd>←</kbd><kbd>→</kbd> focus</span><span><kbd>⇧</kbd><kbd>←</kbd> reorder</span><span><kbd>W</kbd> width</span><span><kbd>S</kbd> stack</span><span>drag a titlebar to reorder</span><span>scroll sideways to travel</span>
-        </div>
-      </div>
-    </section>
 
-    <section class="shell principles" id="how">
-      <div class="principles-top">
-        <div><div class="eyebrow">Designed around the window</div><h2>Room to move.<br>Nothing to juggle.</h2></div>
-          <p>ChainYourMac gives your windows a shared direction. The Mac menu bar app and Windows notification-area app place them side by side, then let you bring one into view at a time. No new desktop to learn. Your apps stay your apps.</p>
-      </div>
-      <div class="feature-grid">
-        <article class="feature"><span class="feature-number">01 / KEEP YOUR SIZE</span><h3>Space comes from scrolling.</h3><p>Opening another window adds room along the strip. Existing windows keep the dimensions you picked.</p></article>
-        <article class="feature"><span class="feature-number">02 / STAY IN FLOW</span><h3>Move with a key or click.</h3><p>Open the small menu bar popover for window controls, or use global shortcuts to focus the previous or next window from anywhere.</p></article>
-        <article class="feature"><span class="feature-number">03 / SET YOUR WIDTH</span><h3>Work at your own scale.</h3><p>Choose a width, center the current window, or return to the exact positions you started with.</p></article>
-        <article class="feature"><span class="feature-number">04 / MADE FOR DESKTOP</span><h3>At home in the system tray.</h3><p>The Mac menu bar app and Windows notification-area app use their native window APIs to position your open app windows.</p></article>
-        <article class="feature"><span class="feature-number">05 / ON YOUR MACHINE</span><h3>Your windows stay local.</h3><p>The app works directly with macOS. No account, sync service, or telemetry is part of this build.</p></article>
-        <article class="feature"><span class="feature-number">06 / YOUR CALL</span><h3>Move them back any time.</h3><p>Restore the original positions in one step. Nothing is permanently rearranged.</p></article>
+        <div class="demo-frame">
+          <div class="demo-chrome">
+            <span class="traffic" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="demo-url">chainedmac / window strip</span>
+            <span class="demo-live"><i></i> LIVE DEMO</span>
+          </div>
+          <div class="demo-viewport" id="demoViewport" tabindex="0" aria-label="Interactive sample window strip. Use Shift plus left or right arrow to change focus.">
+            <div class="demo-strip" id="demoStrip" aria-live="polite"></div>
+          </div>
+          <div class="demo-bottom">
+            <div class="demo-status">
+              <i class="pip" aria-hidden="true"></i>
+              <span><strong id="demoCount">3 windows in strip</strong> · <span id="demoFocus">Code</span></span>
+              <span id="demoMessage" role="status">Choose a window or use the controls.</span>
+            </div>
+            <div class="demo-actions" aria-label="Demo window controls">
+              <button class="demo-button primary" type="button" data-demo-action="arrange"><svg class="ui-icon" aria-hidden="true" focusable="false"><use href="#uui-layout"/></svg>Arrange strip</button>
+              <button class="demo-button" type="button" data-demo-action="previous"><svg class="ui-icon" aria-hidden="true" focusable="false"><use href="#uui-arrow-left"/></svg>Previous</button>
+              <button class="demo-button" type="button" data-demo-action="next">Next<svg class="ui-icon" aria-hidden="true" focusable="false"><use href="#uui-arrow-right"/></svg></button>
+              <button class="demo-button" type="button" data-demo-action="widen"><svg class="ui-icon" aria-hidden="true" focusable="false"><use href="#uui-expand-horizontal"/></svg>Widen</button>
+              <button class="demo-button" type="button" data-demo-action="center"><svg class="ui-icon" aria-hidden="true" focusable="false"><use href="#uui-center"/></svg>Center</button>
+              <button class="demo-button" type="button" data-demo-action="restore"><svg class="ui-icon" aria-hidden="true" focusable="false"><use href="#uui-refresh"/></svg>Restore</button>
+            </div>
+          </div>
+        </div>
+        <div class="demo-hint">
+          <span>Focus this preview, then press <kbd>Shift</kbd><kbd>←</kbd> or <kbd>Shift</kbd><kbd>→</kbd></span>
+          <span>Sample content only · no windows are moved</span>
+        </div>
       </div>
     </section>
 
@@ -317,234 +1166,412 @@
       <div class="shell download-inner">
         <div>
           <div class="eyebrow">Your desktop, with somewhere to go</div>
-          <h2>Make a little more room.</h2>
-        <p>For macOS 13 or later (Apple silicon and Intel) and Windows 11 x64.<br>Windows 10 LTSC/Enterprise is supported too. macOS asks for Accessibility access to move windows.</p>
+          <h2>Make a little<br>more room.</h2>
+          <p>Choose your platform. ChainedMac runs locally and keeps your windows on your machine. macOS needs Accessibility access to move and resize app windows.</p>
         </div>
-        <div class="download-actions">
-          <a class="button button-primary" href="./downloads/ChainYourMac-macOS-universal.zip" download>Download for Mac ↗</a>
-          <a class="button button-quiet" href="./downloads/ChainYourMac-Windows-x64.zip" download>Download for Windows ↗</a>
-          <span class="hero-note">VERSION 1.0 &nbsp;·&nbsp; RUN LOCALLY, NO ACCOUNT</span>
+        <div>
+          <div class="download-options">
+            <a class="download-option" href="./downloads/ChainedMac-macOS-universal.dmg" download>
+              <span class="download-platform-icon" aria-hidden="true"><img src="./assets/apple-logo.png" alt=""></span>
+              <span class="download-label"><strong>Download for Mac</strong><small>Universal DMG · macOS 13+ · Apple silicon + Intel</small></span>
+              <span class="download-arrow"><svg class="ui-icon" aria-hidden="true" focusable="false"><use href="#uui-arrow-up-right"/></svg></span>
+            </a>
+            <a class="download-option" href="./downloads/ChainedMac-Windows-x64.zip" download>
+              <span class="download-platform-icon" aria-hidden="true"><img src="./assets/windows-logo.png" alt=""></span>
+              <span class="download-label"><strong>Download for Windows</strong><small>ZIP · Windows 10/11 · x64</small></span>
+              <span class="download-arrow"><svg class="ui-icon" aria-hidden="true" focusable="false"><use href="#uui-arrow-up-right"/></svg></span>
+            </a>
+          </div>
+          <p class="download-footnote">VERSION 1.0.7 &nbsp;·&nbsp; NO ACCOUNT &nbsp;·&nbsp; RUN LOCALLY</p>
+        </div>
+      </div>
+    </section>
+    <section class="faq-section" id="faq" aria-labelledby="faq-title">
+      <div class="shell faq-layout">
+        <div class="faq-copy">
+          <h2 id="faq-title">FAQs</h2>
+          <p>Everything you need to know about ChainedMac.</p>
+          <p class="faq-contact">Can’t find what you’re looking for? <a href="#get">See the download and setup options</a>.</p>
+        </div>
+
+        <div class="faq-list" aria-label="Frequently asked questions">
+          <div class="faq-item">
+            <h3><button class="faq-trigger" id="faq-trigger-1" type="button" aria-expanded="false" aria-controls="faq-answer-1"><span>What does ChainedMac do?</span><span class="faq-chevron" aria-hidden="true"></span></button></h3>
+            <div class="faq-answer" id="faq-answer-1" role="region" aria-labelledby="faq-trigger-1" hidden><div class="faq-answer-inner"><p class="faq-answer-text">It arranges your open app windows into one horizontal strip. Move focus with the arrow shortcuts, widen or center the focused window, then restore the original positions when you’re done.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <h3><button class="faq-trigger" id="faq-trigger-2" type="button" aria-expanded="false" aria-controls="faq-answer-2"><span>What are the keyboard shortcuts?</span><span class="faq-chevron" aria-hidden="true"></span></button></h3>
+            <div class="faq-answer" id="faq-answer-2" role="region" aria-labelledby="faq-trigger-2" hidden><div class="faq-answer-inner"><p class="faq-answer-text">Use Shift + Left Arrow for the previous window and Shift + Right Arrow for the next. Restore positions with Control + Option + R on Mac or Control + Alt + R on Windows.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <h3><button class="faq-trigger" id="faq-trigger-3" type="button" aria-expanded="false" aria-controls="faq-answer-3"><span>Why does macOS ask for Accessibility access?</span><span class="faq-chevron" aria-hidden="true"></span></button></h3>
+            <div class="faq-answer" id="faq-answer-3" role="region" aria-labelledby="faq-trigger-3" hidden><div class="faq-answer-inner"><p class="faq-answer-text">macOS requires this permission so ChainedMac can move and resize app windows. Turn it on in System Settings → Privacy &amp; Security → Accessibility.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <h3><button class="faq-trigger" id="faq-trigger-4" type="button" aria-expanded="false" aria-controls="faq-answer-4"><span>Does ChainedMac collect my data?</span><span class="faq-chevron" aria-hidden="true"></span></button></h3>
+            <div class="faq-answer" id="faq-answer-4" role="region" aria-labelledby="faq-trigger-4" hidden><div class="faq-answer-inner"><p class="faq-answer-text">No account, cloud service, or telemetry is included. Your preferences stay on your device, and the browser preview uses sample windows only.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <h3><button class="faq-trigger" id="faq-trigger-5" type="button" aria-expanded="false" aria-controls="faq-answer-5"><span>Which computers can run ChainedMac?</span><span class="faq-chevron" aria-hidden="true"></span></button></h3>
+            <div class="faq-answer" id="faq-answer-5" role="region" aria-labelledby="faq-trigger-5" hidden><div class="faq-answer-inner"><p class="faq-answer-text">The Mac app supports macOS 13 or later on Apple silicon and Intel. A Windows x64 build is available for Windows 11 and Windows 10 LTSC or Enterprise.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <h3><button class="faq-trigger" id="faq-trigger-6" type="button" aria-expanded="false" aria-controls="faq-answer-6"><span>Will new windows join the strip automatically?</span><span class="faq-chevron" aria-hidden="true"></span></button></h3>
+            <div class="faq-answer" id="faq-answer-6" role="region" aria-labelledby="faq-trigger-6" hidden><div class="faq-answer-inner"><p class="faq-answer-text">The strip contains the movable windows that were open when you arranged it. If you open or close a window afterward, arrange again to refresh the strip.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <h3><button class="faq-trigger" id="faq-trigger-7" type="button" aria-expanded="false" aria-controls="faq-answer-7"><span>What happens when I quit ChainedMac?</span><span class="faq-chevron" aria-hidden="true"></span></button></h3>
+            <div class="faq-answer" id="faq-answer-7" role="region" aria-labelledby="faq-trigger-7" hidden><div class="faq-answer-inner"><p class="faq-answer-text">Quit restores the window positions captured when you arranged the strip. If an app prevents a window from being restored, ChainedMac stays open so you can retry. A force quit or crash can bypass this cleanup.</p></div></div>
+          </div>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="shell footer">
-    <span>© 2026 ChainYourMac &nbsp;·&nbsp; MAKE ROOM FOR THE WORK.</span>
-    <div class="footer-links"><a href="#demo">Interactive demo</a><a href="#how">How it works</a><a href="#get">Download</a></div>
+  <footer class="footer">
+    <img class="footer-decor footer-trash" src="./assets/footer-trash.avif" alt="" aria-hidden="true" draggable="false">
+    <a class="footer-decor footer-folder-btn" href="#demo" aria-label="Try the ChainedMac window strip">
+      <img src="./assets/footer-folder.avif" alt="" draggable="false">
+    </a>
+    <div class="shell">
+      <div class="footer-grid">
+        <nav class="footer-column" aria-label="Product">
+          <h2>Product</h2>
+          <a href="#how">How it works</a>
+          <a href="#demo">Try the strip</a>
+          <a href="#get">Get ChainedMac</a>
+          <a href="#how">Keyboard shortcuts</a>
+          <a href="#faq">FAQs</a>
+        </nav>
+
+        <nav class="footer-column" aria-label="Resources">
+          <h2>Resources</h2>
+          <a href="./downloads/ChainedMac-macOS-universal.dmg" download>macOS · Universal DMG</a>
+          <a href="./downloads/ChainedMac-Windows-x64.zip" download>Windows · x64 ZIP</a>
+          <a href="#how">Keyboard shortcuts</a>
+          <a href="#get">Accessibility access</a>
+        </nav>
+
+        <nav class="footer-column" aria-label="Connect">
+          <h2>Connect</h2>
+          <a href="#demo">Try the live preview</a>
+          <a href="./downloads/ChainedMac-macOS-universal.dmg" download>Download for Mac</a>
+          <a href="./downloads/ChainedMac-Windows-x64.zip" download>Download for Windows</a>
+          <a href="#top">Back to top</a>
+        </nav>
+
+        <section class="footer-column footer-disclaimer" aria-label="Disclaimer">
+          <h2>Disclaimer</h2>
+          <p>*ChainedMac only moves windows when you arrange them; the browser preview uses sample windows.*</p>
+        </section>
+      </div>
+
+      <div class="footer-mark" aria-hidden="true">
+        <img class="footer-mark-static" src="./assets/footer-wordmark-purple.webp" alt="" draggable="false" loading="lazy" decoding="async">
+      </div>
+      <p class="footer-copy">© 2026 ChainedMac</p>
+    </div>
   </footer>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    (() => {
-      const apps = ["Safari", "Terminal", "Notes", "Mail", "Code", "Music"];
-      const makeWindow = (name, serial) => ({ id: `${name}-${serial}`, name, width: 340, tabbed: false });
-      let serial = 7;
-      let columns = [
-        { items: [makeWindow("Notes", 1)], width: 340, tabs: false },
-        { items: [makeWindow("Code", 2)], width: 400, tabs: false },
-        { items: [makeWindow("Safari", 3)], width: 340, tabs: false }
+    (function () {
+      const footerArtwork = document.querySelector(".footer-mark");
+      if (footerArtwork) {
+        footerArtwork.addEventListener("contextmenu", function (event) { event.preventDefault(); });
+        footerArtwork.addEventListener("dragstart", function (event) { event.preventDefault(); });
+      }
+      const footerFolder = document.querySelector(".footer-folder-btn");
+      if (footerFolder) {
+        footerFolder.addEventListener("contextmenu", function (event) { event.preventDefault(); });
+        footerFolder.addEventListener("dragstart", function (event) { event.preventDefault(); });
+      }
+
+      const faqItems = Array.prototype.slice.call(document.querySelectorAll(".faq-item"));
+      faqItems.forEach(function (item) {
+        const trigger = item.querySelector(".faq-trigger");
+        const answer = item.querySelector(".faq-answer");
+        const answerText = item.querySelector(".faq-answer-text");
+        const characters = Array.from(answerText.textContent.trim());
+        answerText.textContent = "";
+        characters.forEach(function (character, index) {
+          const letter = document.createElement("span");
+          letter.className = "faq-char";
+          letter.textContent = character === " " ? "\u00a0" : character;
+          letter.style.setProperty("--char-delay", (index * 0.015) + "s");
+          letter.style.setProperty("--char-reverse-delay", ((characters.length - index - 1) * 0.002) + "s");
+          answerText.appendChild(letter);
+        });
+        item.dataset.charCount = String(characters.length);
+
+        function closeItem() {
+          if (trigger.getAttribute("aria-expanded") !== "true") return;
+          trigger.setAttribute("aria-expanded", "false");
+          item.classList.remove("is-open");
+          item.classList.add("is-closing");
+          window.clearTimeout(item.faqCloseTimer);
+          const closeDelay = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+            ? 20
+            : Math.min(1100, 320 + characters.length * 2);
+          item.faqCloseTimer = window.setTimeout(function () {
+            if (trigger.getAttribute("aria-expanded") === "false") {
+              answer.hidden = true;
+              item.classList.remove("is-closing");
+            }
+          }, closeDelay);
+        }
+
+        function openItem() {
+          window.clearTimeout(item.faqCloseTimer);
+          answer.hidden = false;
+          item.classList.remove("is-closing");
+          void answer.offsetHeight;
+          trigger.setAttribute("aria-expanded", "true");
+          item.classList.add("is-open");
+        }
+
+        trigger.addEventListener("click", function () {
+          if (trigger.getAttribute("aria-expanded") === "true") {
+            closeItem();
+            return;
+          }
+          faqItems.forEach(function (otherItem) {
+            if (otherItem !== item) {
+              const otherTrigger = otherItem.querySelector(".faq-trigger");
+              if (otherTrigger.getAttribute("aria-expanded") === "true") {
+                otherTrigger.click();
+              }
+            }
+          });
+          openItem();
+        });
+      });
+
+      const preview = document.querySelector(".hero-preview");
+      if (!preview) return;
+
+      const cards = Array.prototype.slice.call(preview.querySelectorAll("[data-hero-window-index]"));
+      const railItems = Array.prototype.slice.call(preview.querySelectorAll("[data-hero-rail]"));
+      const focusLabel = document.getElementById("heroFocusLabel");
+      const focusStatus = document.getElementById("heroFocusStatus");
+      const windowNames = ["Notes", "Code", "Calendar"];
+      const row = preview.querySelector(".mock-window-row");
+      const arrangeButton = preview.querySelector('[data-hero-action="arrange"]');
+      let active = 1;
+      let arrangeTimer;
+
+      function updateFocus(index, focusCard, animate) {
+        active = Math.max(0, Math.min(cards.length - 1, index));
+        cards.forEach(function (card, cardIndex) {
+          card.classList.toggle("focused", cardIndex === active);
+          card.setAttribute("aria-pressed", cardIndex === active ? "true" : "false");
+          card.setAttribute("aria-label", "Focus " + windowNames[cardIndex] + " window" + (cardIndex === active ? ", currently in focus" : ""));
+          card.classList.remove("is-changing");
+        });
+        railItems.forEach(function (item, itemIndex) {
+          item.classList.toggle("is-active", itemIndex === active);
+        });
+        focusLabel.textContent = "WINDOW 0" + (active + 1) + " / IN FOCUS";
+        focusStatus.textContent = "3 windows in strip · " + windowNames[active] + " in focus";
+        if (animate) {
+          void cards[active].offsetWidth;
+          cards[active].classList.add("is-changing");
+        }
+        if (focusCard) cards[active].focus({ preventScroll: true });
+        if ((focusCard || animate) && window.matchMedia("(max-width: 680px)").matches) {
+          const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+          const rowBounds = row.getBoundingClientRect();
+          const cardBounds = cards[active].getBoundingClientRect();
+          const targetLeft = row.scrollLeft + cardBounds.left - rowBounds.left - (row.clientWidth - cardBounds.width) / 2;
+          const maxScroll = Math.max(0, row.scrollWidth - row.clientWidth);
+          row.scrollTo({ left: Math.max(0, Math.min(maxScroll, targetLeft)), behavior: behavior });
+        }
+      }
+
+      function moveFocus(direction, focusCard) {
+        const next = Math.max(0, Math.min(cards.length - 1, active + direction));
+        if (next === active) {
+          focusStatus.textContent = direction < 0 ? "First window · Notes is in focus" : "Last window · Calendar is in focus";
+          return;
+        }
+        updateFocus(next, focusCard === true, true);
+      }
+
+      preview.addEventListener("click", function (event) {
+        const actionButton = event.target.closest("[data-hero-action]");
+        if (actionButton) {
+          const action = actionButton.dataset.heroAction;
+          if (action === "previous") moveFocus(-1, false);
+          if (action === "next") moveFocus(1, false);
+          if (action === "arrange") {
+            window.clearTimeout(arrangeTimer);
+            row.classList.remove("is-arranging");
+            void row.offsetWidth;
+            row.classList.add("is-arranging");
+            actionButton.querySelector("span").textContent = "Strip arranged";
+            focusStatus.textContent = "The sample windows are in one strip.";
+            arrangeTimer = window.setTimeout(function () {
+              row.classList.remove("is-arranging");
+              actionButton.querySelector("span").textContent = "Arrange open windows";
+            }, 900);
+          }
+          if (action === "restore") {
+            window.clearTimeout(arrangeTimer);
+            row.classList.remove("is-arranging");
+            arrangeButton.querySelector("span").textContent = "Arrange open windows";
+            updateFocus(1, false, true);
+            focusStatus.textContent = "Sample preview reset · Code in focus";
+          }
+          return;
+        }
+
+        const card = event.target.closest("[data-hero-window-index]");
+        if (card) updateFocus(Number(card.dataset.heroWindowIndex), true, true);
+      });
+
+      preview.addEventListener("keydown", function (event) {
+        if (event.shiftKey && !event.altKey && !event.ctrlKey && !event.metaKey) {
+          if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            moveFocus(-1, true);
+            return;
+          }
+          if (event.key === "ArrowRight") {
+            event.preventDefault();
+            moveFocus(1, true);
+            return;
+          }
+        }
+
+        const card = event.target.closest("[data-hero-window-index]");
+        if (card && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          updateFocus(Number(card.dataset.heroWindowIndex), true, true);
+        }
+      });
+
+      updateFocus(active, false, false);
+    })();
+
+    (function () {
+      const demoStrip = document.getElementById("demoStrip");
+      const demoViewport = document.getElementById("demoViewport");
+      const demoCount = document.getElementById("demoCount");
+      const demoFocus = document.getElementById("demoFocus");
+      const demoMessage = document.getElementById("demoMessage");
+      const arrangeButton = document.querySelector('[data-demo-action="arrange"]');
+
+      const windows = [
+        { name: "Notes", title: "Field notes", kind: "notes", width: 300 },
+        { name: "Code", title: "WindowStrip.swift", kind: "code", width: 340 },
+        { name: "Calendar", title: "Today", kind: "calendar", width: 300 }
       ];
-      let focus = 2;
-      let dim = false;
-      let offset = 0;
-      const widthSteps = [280, 340, 400, 485];
-      let toastTimer;
-      const strip = document.getElementById("simStrip");
-      const display = document.getElementById("simDisplay");
-      const counter = document.getElementById("focusCounter");
-      const status = document.getElementById("statusMessage");
-      const toast = document.getElementById("toast");
-      const section = (i) => columns[i];
-      const selectedItem = (column) => column.items.find(item => item.id === column.activeId) || column.items.at(-1);
-      const focusedItem = () => columns[focus] && selectedItem(columns[focus]);
-      const allItems = () => columns.flatMap(column => column.items);
-      const getItemColumn = (id) => columns.findIndex(column => column.items.some(item => item.id === id));
-      const notify = (message) => {
-        status.textContent = message;
-        toast.textContent = message;
-        toast.classList.add("visible");
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toast.classList.remove("visible"), 1550);
-      };
-      const surface = (name) => {
-        if (name === "Terminal") return `<div class="surface-terminal"><span class="prompt">~/projects/desktop $</span><br>chainyourmac --arrange<br><span class="prompt">✓</span> 6 windows in strip<br><span class="prompt">→</span> next window<br><br><span class="prompt">~/projects/desktop $</span> _</div>`;
-        if (name === "Code") return `<div class="surface-code"><span class="code-n">21</span><span><span class="hl">func</span> focusNext() {</span><span class="code-n">22</span><span>&nbsp; let window = strip.next()</span><span class="code-n">23</span><span>&nbsp; window.bringIntoView()</span><span class="code-n">24</span><span>}</span><span class="code-n">25</span><span>&nbsp;</span><span class="code-n">26</span><span><span class="hl">// keep the good size</span></span></div>`;
-        if (name === "Mail") return `<div class="surface-mail">From: a friend<b>Re: This is a good idea</b><p>I've been looking for a calmer way to keep all these windows in reach.</p><span>✎ &nbsp; Reply</span></div>`;
-        if (name === "Music") return `<div class="surface-mail"><span>NOW PLAYING</span><b>A Walk — Tycho</b><div class="surface-line"></div><p>◀ &nbsp;&nbsp; ▮▮ &nbsp;&nbsp; ▶</p></div>`;
-        if (name === "Notes") return `<div class="surface-tag">FIELD NOTES / 04</div><h3 class="surface-heading">A thought worth keeping.</h3><p class="surface-copy">Collect a small idea. Leave it somewhere easy to find when you're ready.</p><div class="surface-lines"><i class="surface-line"></i><i class="surface-line"></i><i class="surface-line"></i></div>`;
-        return `<div class="surface-tag">TODAY / 10:42</div><h3 class="surface-heading">One thing, in focus.</h3><p class="surface-copy">The full web, a little closer. Keep the other windows right where they belong.</p><div class="surface-lines"><i class="surface-line"></i><i class="surface-line"></i></div>`;
-      };
-      const render = (preserveOffset = true) => {
-        const focusedId = focusedItem()?.id;
-        strip.innerHTML = columns.map((column, i) => {
-          const active = column.items.find(item => item.id === focusedId) || selectedItem(column);
-          const stacked = column.items.length > 1;
-          const tabs = stacked ? `<div class="stack-tabs" style="height:22px;display:flex;gap:3px;padding:3px 8px;background:#e9ebe4">${column.items.map((item, n) => `<button data-tab="${item.id}" style="flex:1;min-width:0;border:0;border-radius:3px;background:${item.id === active.id ? '#d9ded4' : 'transparent'};color:#667268;font:8px var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.name}</button>`).join("")}</div>` : "";
-          const isFocus = i === focus;
-          return `<article class="sim-window ${isFocus ? "focused" : ""} ${dim ? "dimmed" : ""}" data-column="${i}" style="--window-width:${column.width}px"><div class="sim-window-head" data-drag="${i}"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span class="sim-window-title">${active.name} — ${active.name === "Safari" ? "Today" : active.name === "Code" ? "Workbench" : active.name === "Notes" ? "Field notes" : active.name === "Mail" ? "Inbox" : active.name === "Terminal" ? "Shell" : "Now playing"}</span><button class="close-window" data-close="${active.id}" aria-label="Close ${active.name} window">×</button></div>${tabs}<div class="sim-window-body" data-focus="${active.id}">${surface(active.name)}</div></article>`;
+      const originalWidths = windows.map(function (item) { return item.width; });
+      let active = 1;
+      let arranged = true;
+      const widthSteps = [260, 300, 360, 430];
+      const widthIndex = [1, 2, 1];
+
+      function windowBody(item) {
+        if (item.kind === "code") {
+          return '<div class="demo-window-body"><div class="tag">CHAINEDMAC / SOURCE</div><div class="demo-code"><span>21</span><span><b>func</b> focusNext() {</span><span>22</span><span>&nbsp; strip.focusNext()</span><span>23</span><span>&nbsp; keepWindowSize()</span><span>24</span><span>}</span><span>25</span><span><b>// make room</b></span></div></div>';
+        }
+        if (item.kind === "calendar") {
+          return '<div class="demo-window-body"><div class="tag">YOUR AFTERNOON</div><h3>One thing, in focus.</h3><p>Keep the next window in reach without shrinking the one you are using.</p><div class="demo-event"><div><strong>2:00</strong><span>Design review</span></div><div><strong>3:30</strong><span>Walk + reset</span></div><div><strong>4:00</strong><span>Ship the small thing</span></div></div></div>';
+        }
+        return '<div class="demo-window-body"><div class="tag">FIELD NOTES / 04</div><h3>A thought worth keeping.</h3><p>Collect a small idea. Leave it somewhere easy to find when you are ready.</p><div class="demo-lines"><i></i><i></i><i></i></div></div>';
+      }
+
+      function render(scrollToFocus) {
+        demoStrip.classList.toggle("is-arranged", arranged);
+        demoStrip.classList.toggle("is-restored", !arranged);
+        demoStrip.innerHTML = windows.map(function (item, index) {
+          return '<article class="demo-window ' + (index === active ? "is-focused" : "") + '" data-window-index="' + index + '" style="--window-width:' + item.width + 'px" tabindex="0" aria-label="' + item.name + (index === active ? ', focused' : '') + '">' +
+            '<div class="demo-window-head"><i></i><i></i><i></i><span>' + item.title + ' — ' + item.name + '</span></div>' +
+            windowBody(item) +
+            '</article>';
         }).join("");
-        counter.textContent = `${String(focus + 1).padStart(2, "0")} / ${String(columns.length).padStart(2, "0")}`;
-        if (preserveOffset && columns.length) {
-          const focusedCard = strip.querySelector(`[data-column="${focus}"]`);
-          const target = focusedCard ? focusedCard.offsetLeft + focusedCard.offsetWidth / 2 - display.clientWidth / 2 : 0;
-          offset = Math.max(0, target);
-          strip.style.transform = `translateX(${-offset}px)`;
-        } else {
-          offset = 0;
-          strip.style.transform = "translateX(0)";
+        demoCount.textContent = windows.length + (windows.length === 1 ? " window in strip" : " windows in strip");
+        demoFocus.textContent = windows[active].name;
+        arrangeButton.textContent = arranged ? "Strip arranged" : "Arrange strip";
+        arrangeButton.disabled = arranged;
+
+        if (scrollToFocus && arranged) {
+          const card = demoStrip.querySelector('[data-window-index="' + active + '"]');
+          if (card) card.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
         }
-      };
-      const act = (name) => {
-        if (!columns.length) return;
-        const current = section(focus);
-        const win = focusedItem();
-        const n = columns.length;
-        if (name === "left" || name === "right") {
-          const next = Math.max(0, Math.min(n - 1, focus + (name === "left" ? -1 : 1)));
-          if (next === focus) return notify(name === "left" ? "You're at the first window." : "You're at the last window.");
-          focus = next; render(); notify(`Focused ${focusedItem().name}.`); return;
-        }
-        if (name === "moveLeft" || name === "moveRight") {
-          const to = focus + (name === "moveLeft" ? -1 : 1);
-          if (to < 0 || to >= n) return notify("There isn't another window in that direction.");
-          [columns[focus], columns[to]] = [columns[to], columns[focus]];
-          focus = to; render(); notify(`Moved ${win.name}.`); return;
-        }
-        if (name === "width") {
-          const next = widthSteps.find(width => width > current.width + 1) ?? widthSteps[0];
-          current.width = next; render(); notify(`Window width: ${next} points.`); return;
-        }
-        if (name === "center") {
-          const selected = strip.querySelector(`[data-column="${focus}"]`);
-          if (selected) { offset = Math.max(0, selected.offsetLeft + selected.offsetWidth / 2 - display.clientWidth / 2); strip.style.transform = `translateX(${-offset}px)`; }
-          notify(`Centered ${win.name}.`); return;
-        }
-        if (name === "stack") {
-          if (focus === 0) return notify("Add a window to the left before stacking.");
-          const target = columns[focus - 1];
-          const moved = current.items.pop();
-          target.items.push(moved);
-          target.activeId = moved.id;
-          current.activeId = current.items.at(-1)?.id;
-          target.width = Math.max(target.width, current.width);
-          columns.splice(focus, 1); focus -= 1; render(); notify(`Stacked ${moved.name} with ${target.items[0].name}.`); return;
-        }
-        if (name === "unstack") {
-          if (current.items.length < 2) return notify("This window isn't stacked.");
-          const moved = current.items.pop();
-          current.activeId = current.items.at(-1)?.id;
-          columns.splice(focus + 1, 0, { items: [moved], activeId: moved.id, width: current.width, tabs: false });
-          focus += 1; render(); notify(`Moved ${moved.name} back into the strip.`); return;
-        }
-        if (name === "tabs") {
-          if (current.items.length < 2) return notify("Stack two windows to show tabs.");
-          current.tabs = !current.tabs; render(); notify(current.tabs ? "Tabs shown on this stack." : "Tabs hidden."); return;
-        }
-        if (name === "dim") {
-          dim = !dim;
-          document.querySelector('[data-action="dim"]').classList.toggle("active", dim);
-          document.querySelector('[data-action="dim"]').setAttribute("aria-pressed", String(dim));
-          render(false); notify(dim ? "Other windows dimmed." : "All windows at full brightness.");
-        }
-      };
-      document.querySelectorAll("[data-action]").forEach(button => button.addEventListener("click", () => act(button.dataset.action)));
-      document.querySelectorAll("[data-open]").forEach(button => button.addEventListener("click", () => {
-        const name = button.dataset.open;
-        if (allItems().some(item => item.name === name)) return notify(`${name} is already in the strip.`);
-        columns.splice(focus + 1, 0, { items: [makeWindow(name, serial++)], width: 340, tabs: false });
-        focus += 1; render(); notify(`Opened ${name} to the right.`);
-      }));
-      strip.addEventListener("click", event => {
-        const close = event.target.closest("[data-close]");
-        if (close) {
-          const id = close.dataset.close;
-          if (allItems().length < 2) return notify("Keep at least one window in the strip.");
-          const colIndex = getItemColumn(id);
-          const column = columns[colIndex];
-          if (column.items.length > 1) column.items.splice(column.items.findIndex(item => item.id === id), 1);
-          else { columns.splice(colIndex, 1); focus = Math.min(focus, columns.length - 1); }
-          render(); notify("Window closed from the demo strip."); return;
-        }
-        const tab = event.target.closest("[data-tab]");
-        if (tab) {
-          const colIndex = getItemColumn(tab.dataset.tab);
-          const col = columns[colIndex];
-          const selected = col.items.find(item => item.id === tab.dataset.tab);
-          if (selected) { col.activeId = selected.id; focus = colIndex; render(); }
-          notify(`Selected ${selected.name} tab.`); return;
-        }
-        const body = event.target.closest("[data-focus]");
-        if (body) { const index = getItemColumn(body.dataset.focus); if (index >= 0) { focus = index; render(); notify(`Focused ${focusedItem().name}.`); } }
-      });
-      display.addEventListener("keydown", event => {
-        if (event.altKey || event.ctrlKey || event.metaKey) return;
-        if (event.key === "ArrowLeft") { event.preventDefault(); act(event.shiftKey ? "moveLeft" : "left"); }
-        if (event.key === "ArrowRight") { event.preventDefault(); act(event.shiftKey ? "moveRight" : "right"); }
-        if (!event.shiftKey && event.key.toLowerCase() === "w") act("width");
-        if (!event.shiftKey && event.key.toLowerCase() === "c") act("center");
-        if (event.key.toLowerCase() === "s") act(event.shiftKey ? "unstack" : "stack");
-        if (!event.shiftKey && event.key.toLowerCase() === "t") act("tabs");
-      });
-      let dragX = null;
-      let titleDrag = null;
-      display.addEventListener("pointerdown", event => {
-        if (event.target.closest("button")) return;
-        const titlebar = event.target.closest("[data-drag]");
-        if (titlebar) {
-          titleDrag = { from: Number(titlebar.dataset.drag), startX: event.clientX, pointerId: event.pointerId, moved: false };
-          display.classList.add("dragging");
-          display.setPointerCapture(event.pointerId);
+      }
+
+      function notify(text) {
+        demoMessage.textContent = text;
+      }
+
+      function focusMove(direction) {
+        if (!arranged) {
+          notify("Arrange the strip before moving focus.");
           return;
         }
-        dragX = event.clientX;
-        display.classList.add("dragging");
-        display.setPointerCapture(event.pointerId);
-      });
-      display.addEventListener("pointermove", event => {
-        if (!titleDrag || titleDrag.pointerId !== event.pointerId) return;
-        if (!titleDrag.moved && Math.abs(event.clientX - titleDrag.startX) < 7) return;
-        titleDrag.moved = true;
-        const cards = [...strip.querySelectorAll(".sim-window")];
-        const target = cards.findIndex(card => event.clientX < card.getBoundingClientRect().left + card.getBoundingClientRect().width / 2);
-        const to = target < 0 ? cards.length - 1 : target;
-        const from = titleDrag.from;
-        if (to === from) return;
-        const [moving] = columns.splice(from, 1);
-        columns.splice(to, 0, moving);
-        if (focus === from) focus = to;
-        else if (from < focus && to >= focus) focus -= 1;
-        else if (from > focus && to <= focus) focus += 1;
-        titleDrag.from = to;
-        render();
-      });
-      display.addEventListener("pointerup", event => {
-        if (titleDrag && titleDrag.pointerId === event.pointerId) {
-          const drag = titleDrag;
-          titleDrag = null;
-          display.classList.remove("dragging");
-          if (drag.moved) notify(`Moved ${selectedItem(columns[drag.from]).name} in the strip.`);
-          else { focus = drag.from; render(); notify(`Focused ${focusedItem().name}.`); }
+        const next = Math.max(0, Math.min(windows.length - 1, active + direction));
+        if (next === active) {
+          notify(direction < 0 ? "You are at the first window." : "You are at the last window.");
           return;
         }
-        if (dragX === null) return;
-        const delta = dragX - event.clientX;
-        dragX = null;
-        display.classList.remove("dragging");
-        if (Math.abs(delta) > 45) act(delta > 0 ? "right" : "left");
+        active = next;
+        render(true);
+        notify("Focused " + windows[active].name + ".");
+      }
+
+      document.querySelectorAll("[data-demo-action]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          const action = button.dataset.demoAction;
+          if (action === "arrange") {
+            arranged = true;
+            render(true);
+            notify("The sample windows are in one strip.");
+          } else if (action === "previous") {
+            focusMove(-1);
+          } else if (action === "next") {
+            focusMove(1);
+          } else if (action === "widen") {
+            if (!arranged) return notify("Arrange the strip before changing a window width.");
+            const current = windows[active];
+            const step = widthSteps.findIndex(function (width) { return width > current.width; });
+            current.width = widthSteps[step < 0 ? 0 : step];
+            render(true);
+            notify("Widened " + current.name + ".");
+          } else if (action === "center") {
+            if (!arranged) return notify("Arrange the strip before centering a window.");
+            render(true);
+            notify("Centered " + windows[active].name + ".");
+          } else if (action === "restore") {
+            arranged = false;
+            windows.forEach(function (item, index) { item.width = originalWidths[index] || 300; });
+            active = Math.min(1, windows.length - 1);
+            render(false);
+            notify("The sample windows returned to their original positions.");
+          }
+        });
       });
-      display.addEventListener("pointercancel", () => { dragX = null; titleDrag = null; display.classList.remove("dragging"); });
-      let wheelTimer;
-      display.addEventListener("wheel", event => {
-        const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : (event.shiftKey ? event.deltaY : 0);
-        if (!delta) return;
-        event.preventDefault();
-        offset = Math.max(0, Math.min(strip.scrollWidth - display.clientWidth, offset + delta));
-        strip.style.transition = "none";
-        strip.style.transform = `translateX(${-offset}px)`;
-        clearTimeout(wheelTimer);
-        wheelTimer = setTimeout(() => { strip.style.transition = ""; }, 130);
-      }, { passive: false });
+
+      demoStrip.addEventListener("click", function (event) {
+        const card = event.target.closest("[data-window-index]");
+        if (!card) return;
+        active = Number(card.dataset.windowIndex);
+        render(arranged);
+        notify("Focused " + windows[active].name + ".");
+      });
+
+      demoViewport.addEventListener("keydown", function (event) {
+        if (!event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) return;
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          focusMove(-1);
+        }
+        if (event.key === "ArrowRight") {
+          event.preventDefault();
+          focusMove(1);
+        }
+      });
+
       render(false);
     })();
   </script>

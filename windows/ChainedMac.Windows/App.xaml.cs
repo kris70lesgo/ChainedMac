@@ -2,7 +2,7 @@ using System.Drawing;
 using System.Windows;
 using Forms = System.Windows.Forms;
 
-namespace ChainYourMac.Windows;
+namespace ChainedMac.Windows;
 
 public partial class App : System.Windows.Application
 {
@@ -20,13 +20,13 @@ public partial class App : System.Windows.Application
         trayIcon = new Forms.NotifyIcon
         {
             Icon = Icon.ExtractAssociatedIcon(Environment.ProcessPath!) ?? SystemIcons.Application,
-            Text = "ChainYourMac",
+            Text = "ChainedMac",
             Visible = true
         };
         trayIcon.DoubleClick += (_, _) => ShowMainWindow();
 
         var menu = new Forms.ContextMenuStrip();
-        menu.Items.Add("Open ChainYourMac", null, (_, _) => ShowMainWindow());
+        menu.Items.Add("Open ChainedMac", null, (_, _) => ShowMainWindow());
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("Quit", null, (_, _) => QuitApplication());
         trayIcon.ContextMenuStrip = menu;
@@ -40,7 +40,7 @@ public partial class App : System.Windows.Application
 
     private void QuitApplication()
     {
-        mainWindow?.PrepareForExit();
+        if (mainWindow is not null && !mainWindow.PrepareForExit()) return;
         trayIcon?.Dispose();
         trayIcon = null;
         Shutdown();

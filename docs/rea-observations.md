@@ -1,4 +1,4 @@
-# REA observations — ChainYourMac reference
+# REA observations — original ChainYourMac reference
 
 The public [ChainYourMac page](https://chainyourmac.com/) was inspected in the browser. REA CLI 6.7.0 then parsed its first-party `app.js` bundle as inert JavaScript; it did not execute the page or contact the reference service from the analysis process.
 
@@ -11,4 +11,4 @@ The public [ChainYourMac page](https://chainyourmac.com/) was inspected in the b
 
 REA reported that this was a partial static analysis: two inventoried files were outside the selected source scope, JavaScript was parsed without execution, and dynamic paths remained unresolved. It found no Electron window, IPC, or native-addon architecture in the selected website bundle. Those limits mean the browser demo supports the interaction notes above, but does not establish how the reference's separate Mac application works internally.
 
-This repository is an independent macOS and Windows desktop implementation, plus a standalone HTML landing page and browser-only simulator. Its implementation details, release process, and v1 scope are described in the root README.
+ChainedMac is an independent macOS and Windows desktop implementation, plus a standalone HTML landing page and browser-only simulator. Its implementation details, release process, and v1 scope are described in the root README.

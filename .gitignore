@@ -3,5 +3,6 @@
 dist/
 .DS_Store
 website/downloads/*.zip
-windows/ChainYourMac.Windows/bin/
-windows/ChainYourMac.Windows/obj/
+website/downloads/*.dmg
+windows/ChainedMac.Windows/bin/
+windows/ChainedMac.Windows/obj/

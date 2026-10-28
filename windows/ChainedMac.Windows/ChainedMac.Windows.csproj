@@ -7,13 +7,13 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>Assets\ChainYourMac.ico</ApplicationIcon>
-    <Version>1.0.0</Version>
-    <AssemblyName>ChainYourMac</AssemblyName>
-    <RootNamespace>ChainYourMac.Windows</RootNamespace>
+    <ApplicationIcon>Assets\ChainedMac.ico</ApplicationIcon>
+    <Version>1.0.7</Version>
+    <AssemblyName>ChainedMac</AssemblyName>
+    <RootNamespace>ChainedMac.Windows</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Resource Include="Assets\ChainYourMacMark.png" />
-    <Resource Include="Assets\ChainYourMac.ico" />
+    <Resource Include="Assets\ChainedMacMark.png" />
+    <Resource Include="Assets\ChainedMac.ico" />
   </ItemGroup>
 </Project>

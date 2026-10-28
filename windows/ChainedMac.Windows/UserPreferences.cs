@@ -1,11 +1,15 @@
 using System.IO;
 using System.Text.Json;
 
-namespace ChainYourMac.Windows;
+namespace ChainedMac.Windows;
 
 internal sealed class UserPreferences
 {
-    private static readonly string SettingsPath = Path.Combine(
+    private static readonly string SettingsDirectory = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "ChainedMac");
+    private static readonly string SettingsPath = Path.Combine(SettingsDirectory, "settings.json");
+    private static readonly string LegacySettingsPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "ChainYourMac",
         "settings.json");
@@ -17,10 +21,13 @@ internal sealed class UserPreferences
     {
         try
         {
-            if (File.Exists(SettingsPath))
+            foreach (var path in new[] { SettingsPath, LegacySettingsPath })
             {
-                var loaded = JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(SettingsPath));
-                if (loaded is not null) return loaded;
+                if (!File.Exists(path)) continue;
+                var loaded = JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(path));
+                if (loaded is null) continue;
+                if (path == LegacySettingsPath) loaded.Save();
+                return loaded;
             }
         }
         catch (IOException) { }
@@ -32,7 +39,7 @@ internal sealed class UserPreferences
     {
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
+            Directory.CreateDirectory(SettingsDirectory);
             File.WriteAllText(SettingsPath, JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
         }
         catch (IOException) { }

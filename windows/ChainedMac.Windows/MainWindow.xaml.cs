@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
 
-namespace ChainYourMac.Windows;
+namespace ChainedMac.Windows;
 
 public partial class MainWindow : System.Windows.Window
 {
@@ -45,12 +45,20 @@ public partial class MainWindow : System.Windows.Window
         manager?.Refresh();
     }
 
-    public void PrepareForExit()
+    public bool PrepareForExit()
     {
-        if (manager?.IsArranged == true) manager.Restore();
+        if (manager?.IsArranged == true && !manager.Restore())
+        {
+            Show();
+            WindowState = System.Windows.WindowState.Normal;
+            UpdateView();
+            Activate();
+            return false;
+        }
         UnregisterShortcuts();
         allowClose = true;
         Close();
+        return true;
     }
 
     private void Window_SourceInitialized(object? sender, EventArgs e)

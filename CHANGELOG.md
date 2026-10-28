@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.7
+
+- Restore tracked window positions before normal app termination on macOS and Windows.
+- Preserve restore data for minimized and temporarily unavailable windows.
+- Keep ChainedMac running when one or more windows cannot be restored, so Restore can be retried.
+
 ## 1.0.0
 
 First shareable release of the native Mac and Windows apps.

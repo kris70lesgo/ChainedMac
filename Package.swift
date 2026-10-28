@@ -2,15 +2,15 @@
 import PackageDescription
 
 let package = Package(
-    name: "ChainYourMac",
+    name: "ChainedMac",
     platforms: [.macOS(.v13)],
     products: [
-        .executable(name: "ChainYourMac", targets: ["ChainYourMac"])
+        .executable(name: "ChainedMac", targets: ["ChainedMac"])
     ],
     targets: [
         .executableTarget(
-            name: "ChainYourMac",
-            path: "Sources/ChainYourMac",
+            name: "ChainedMac",
+            path: "Sources/ChainedMac",
             exclude: ["Resources"]
         )
     ]

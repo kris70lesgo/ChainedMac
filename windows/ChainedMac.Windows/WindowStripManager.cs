@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Forms = System.Windows.Forms;
 
-namespace ChainYourMac.Windows;
+namespace ChainedMac.Windows;
 
 internal readonly record struct WindowFrame(int X, int Y, int Width, int Height);
 
@@ -56,6 +56,7 @@ internal sealed class WindowStripManager
         }
 
         var existing = windows.ToDictionary(window => window.Handle);
+        var discoveredHandles = discovered.Select(window => window.Handle).ToHashSet();
         var reconciled = new List<ManagedWindow>();
         foreach (var current in discovered)
         {
@@ -72,6 +73,14 @@ internal sealed class WindowStripManager
                 reconciled.Add(current);
             }
         }
+        // Preserve original frames for minimized or temporarily hidden
+        // windows. They are absent from EnumWindows' visible-window list, but
+        // they still need to be restored before ChainedMac exits.
+        reconciled.AddRange(windows.Where(window =>
+            !discoveredHandles.Contains(window.Handle) && IsWindow(window.Handle)));
+        reconciled = reconciled.OrderBy(window => window.Frame.X)
+            .ThenBy(window => window.AppName, StringComparer.OrdinalIgnoreCase)
+            .ToList();
         windows.Clear();
         windows.AddRange(reconciled);
         if (windows.Count == 0)
@@ -162,22 +171,32 @@ internal sealed class WindowStripManager
         NotifyChanged();
     }
 
-    public void Restore()
+    public bool Restore()
     {
-        if (!IsArranged) { Message = "Arrange a strip first."; NotifyChanged(); return; }
-        var total = windows.Count;
+        if (!IsArranged) return true;
         var restored = 0;
+        var total = 0;
         foreach (var window in windows)
         {
             if (!IsWindow(window.Handle)) continue;
+            total++;
             if (SetFrame(window, window.OriginalFrame)) restored++;
         }
+
+        if (restored != total)
+        {
+            Message = $"Restored {restored} of {total} open windows. Some apps refused the change. ChainedMac is still running so you can retry.";
+            NotifyChanged();
+            return false;
+        }
+
         IsArranged = false;
         focusedIndex = 0;
         windows.Clear();
         windows.AddRange(DiscoverWindows());
-        Message = restored == total ? "Restored the original window positions." : $"Restored {restored} of {total} windows.";
+        Message = "Restored the original window positions.";
         NotifyChanged();
+        return true;
     }
 
     public void HandleGlobalShortcut(int identifier)

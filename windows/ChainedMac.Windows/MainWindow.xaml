@@ -1,10 +1,10 @@
-<Window x:Class="ChainYourMac.Windows.MainWindow"
+<Window x:Class="ChainedMac.Windows.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ChainYourMac" Width="390" Height="700" MinHeight="600" MaxHeight="820"
+        Title="ChainedMac" Width="390" Height="700" MinHeight="600" MaxHeight="820"
         ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
         Background="{StaticResource Paper}" Foreground="{StaticResource Ink}"
-        Icon="Assets/ChainYourMac.ico" ShowInTaskbar="True" Closing="Window_Closing">
+        Icon="Assets/ChainedMac.ico" ShowInTaskbar="True" Closing="Window_Closing">
   <ScrollViewer VerticalScrollBarVisibility="Auto">
     <StackPanel Margin="20">
       <Grid Margin="0,0,0,15">
@@ -13,9 +13,9 @@
           <ColumnDefinition Width="*" />
           <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <Image Grid.Column="0" Source="Assets/ChainYourMacMark.png" Width="24" Height="32" Stretch="Uniform" VerticalAlignment="Center" />
+        <Image Grid.Column="0" Source="Assets/ChainedMacMark.png" Width="24" Height="32" Stretch="Uniform" VerticalAlignment="Center" />
         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
-          <TextBlock Text="CHAIN YOUR MAC" FontSize="12" FontWeight="Bold" />
+          <TextBlock Text="CHAINEDMAC" FontSize="12" FontWeight="Bold" />
           <TextBlock x:Name="WindowSummary" Text="Your workspace, in a line" FontSize="11" Foreground="{StaticResource Muted}" Margin="0,3,0,0" />
         </StackPanel>
         <Button Grid.Column="2" Content="Settings" Style="{StaticResource ActionButton}" Padding="9,6" Click="Settings_Click" />
@@ -82,7 +82,7 @@
           </Border>
 
           <DockPanel Margin="0,16,0,0">
-            <TextBlock Text="WIN 11 / 10 LTSC · VERSION 1.0" FontFamily="Consolas" FontSize="8" Foreground="{StaticResource Muted}" VerticalAlignment="Center" />
+            <TextBlock Text="WIN 11 / 10 LTSC · VERSION 1.0.7" FontFamily="Consolas" FontSize="8" Foreground="{StaticResource Muted}" VerticalAlignment="Center" />
             <Button DockPanel.Dock="Right" Content="Quit" Padding="8,3" BorderThickness="0" Background="Transparent" Foreground="{StaticResource Muted}" FontSize="10" Click="Quit_Click" />
           </DockPanel>
         </StackPanel>

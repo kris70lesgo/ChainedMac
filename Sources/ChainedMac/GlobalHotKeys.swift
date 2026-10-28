@@ -28,7 +28,7 @@ final class GlobalHotKeys {
         )
         let installStatus = InstallEventHandler(
             GetApplicationEventTarget(),
-            chainYourMacHotKeyHandler,
+            chainedMacHotKeyHandler,
             1,
             &eventType,
             Unmanaged.passUnretained(self).toOpaque(),
@@ -61,7 +61,7 @@ final class GlobalHotKeys {
     }
 }
 
-private func chainYourMacHotKeyHandler(
+private func chainedMacHotKeyHandler(
     _ nextHandler: EventHandlerCallRef?,
     _ event: EventRef?,
     _ userData: UnsafeMutableRawPointer?

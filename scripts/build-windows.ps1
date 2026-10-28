@@ -1,10 +1,10 @@
 $ErrorActionPreference = 'Stop'
 
 $Root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$Project = Join-Path $Root 'windows/ChainYourMac.Windows/ChainYourMac.Windows.csproj'
+$Project = Join-Path $Root 'windows/ChainedMac.Windows/ChainedMac.Windows.csproj'
 $PublishDirectory = Join-Path $Root 'dist/windows-x64'
-$Zip = Join-Path $Root 'dist/ChainYourMac-Windows-x64.zip'
-$WebsiteZip = Join-Path $Root 'website/downloads/ChainYourMac-Windows-x64.zip'
+$Zip = Join-Path $Root 'dist/ChainedMac-Windows-x64.zip'
+$WebsiteZip = Join-Path $Root 'website/downloads/ChainedMac-Windows-x64.zip'
 
 Remove-Item $PublishDirectory -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item $Zip, $WebsiteZip -Force -ErrorAction SilentlyContinue
@@ -22,10 +22,10 @@ dotnet publish $Project `
   -p:DebugType=None
 
 $PackageReadme = @'
-ChainYourMac for Windows x64
+ChainedMac for Windows x64
 
 1. Extract this ZIP folder.
-2. Run ChainYourMac.exe.
+2. Run ChainedMac.exe.
 3. Keep the app open from the notification area near the clock.
 4. Arrange open windows, then use Shift+Left and Shift+Right to focus them.
 
