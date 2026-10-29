@@ -31,8 +31,8 @@ cat > "$APP/Contents/Info.plist" <<'PLIST'
   <key>CFBundleIdentifier</key><string>com.chainyourmac.app</string>
   <key>CFBundleName</key><string>ChainedMac</string>
   <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>1.0.7</string>
-  <key>CFBundleVersion</key><string>8</string>
+  <key>CFBundleShortVersionString</key><string>1.0.8</string>
+  <key>CFBundleVersion</key><string>9</string>
   <key>CFBundleIconFile</key><string>ChainedMacAppIcon.icns</string>
   <key>LSApplicationCategoryType</key><string>public.app-category.productivity</string>
   <key>LSMinimumSystemVersion</key><string>13.0</string>

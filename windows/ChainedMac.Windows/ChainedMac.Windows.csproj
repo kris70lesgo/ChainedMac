@@ -8,7 +8,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>Assets\ChainedMac.ico</ApplicationIcon>
-    <Version>1.0.7</Version>
+    <Version>1.0.8</Version>
     <AssemblyName>ChainedMac</AssemblyName>
     <RootNamespace>ChainedMac.Windows</RootNamespace>
   </PropertyGroup>

@@ -82,7 +82,7 @@
           </Border>
 
           <DockPanel Margin="0,16,0,0">
-            <TextBlock Text="WIN 11 / 10 LTSC · VERSION 1.0.7" FontFamily="Consolas" FontSize="8" Foreground="{StaticResource Muted}" VerticalAlignment="Center" />
+            <TextBlock Text="WIN 11 / 10 LTSC · VERSION 1.0.8" FontFamily="Consolas" FontSize="8" Foreground="{StaticResource Muted}" VerticalAlignment="Center" />
             <Button DockPanel.Dock="Right" Content="Quit" Padding="8,3" BorderThickness="0" Background="Transparent" Foreground="{StaticResource Muted}" FontSize="10" Click="Quit_Click" />
           </DockPanel>
         </StackPanel>

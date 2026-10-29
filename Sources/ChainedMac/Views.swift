@@ -8,6 +8,7 @@ private enum Palette {
     static let lavender = Color(red: 0.83, green: 0.77, blue: 0.94)
     static let lavenderInk = Color(red: 0.35, green: 0.24, blue: 0.52)
     static let line = Color(red: 0.86, green: 0.83, blue: 0.90)
+    static let sliderTrack = Color(red: 0.72, green: 0.68, blue: 0.78)
     static let green = Color(red: 0.77, green: 0.85, blue: 0.68)
 }
 
@@ -176,9 +177,13 @@ struct MenuBarPanel: View {
                         .font(.system(size: 10, design: .monospaced))
                         .foregroundStyle(Palette.muted)
                 }
-                Slider(value: $manager.gap, in: 0...80, step: 4)
-                    .tint(Palette.lavenderInk)
-                    .onChange(of: manager.gap) { _ in manager.reflow() }
+                HStack {
+                    Spacer(minLength: 0)
+                    StripGapSlider(value: $manager.gap)
+                        .frame(width: 216, height: 28)
+                    Spacer(minLength: 0)
+                }
+                .onChange(of: manager.gap) { _ in manager.reflow() }
             }
 
             VStack(alignment: .leading, spacing: 7) {
@@ -196,7 +201,7 @@ struct MenuBarPanel: View {
             }
 
             HStack {
-                Text("VERSION 1.0.7 · macOS 13+")
+                Text("VERSION 1.0.8 · macOS 13+")
                     .font(.system(size: 8, design: .monospaced))
                     .foregroundStyle(Palette.muted)
                 Spacer()
@@ -204,6 +209,67 @@ struct MenuBarPanel: View {
             }
         }
         .foregroundStyle(Palette.ink)
+    }
+}
+
+private struct StripGapSlider: View {
+    @Binding var value: CGFloat
+
+    private let range: ClosedRange<CGFloat> = 0...80
+    private let step: CGFloat = 4
+    private let thumbDiameter: CGFloat = 18
+
+    var body: some View {
+        GeometryReader { geometry in
+            let travel = max(geometry.size.width - thumbDiameter, 1)
+            let fraction = min(max((value - range.lowerBound) / (range.upperBound - range.lowerBound), 0), 1)
+
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(Palette.sliderTrack)
+                    .frame(width: travel, height: 7)
+                    .offset(x: thumbDiameter / 2)
+
+                Capsule()
+                    .fill(Palette.lavenderInk)
+                    .frame(width: travel * fraction, height: 7)
+                    .offset(x: thumbDiameter / 2)
+
+                Circle()
+                    .fill(Palette.paper)
+                    .frame(width: thumbDiameter, height: thumbDiameter)
+                    .overlay(Circle().stroke(Palette.lavenderInk, lineWidth: 2))
+                    .shadow(color: Palette.ink.opacity(0.16), radius: 2, y: 1)
+                    .offset(x: travel * fraction)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .contentShape(Rectangle())
+            .gesture(DragGesture(minimumDistance: 0).onChanged { gesture in
+                updateValue(at: gesture.location.x, width: geometry.size.width)
+            })
+            .accessibilityElement()
+            .accessibilityLabel("Strip gap")
+            .accessibilityValue("\(Int(value)) points")
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment:
+                    value = min(value + step, range.upperBound)
+                case .decrement:
+                    value = max(value - step, range.lowerBound)
+                @unknown default:
+                    break
+                }
+            }
+        }
+        .frame(height: 28)
+    }
+
+    private func updateValue(at location: CGFloat, width: CGFloat) {
+        let travel = max(width - thumbDiameter, 1)
+        let fraction = min(max((location - thumbDiameter / 2) / travel, 0), 1)
+        let rawValue = range.lowerBound + fraction * (range.upperBound - range.lowerBound)
+        let snappedValue = (rawValue / step).rounded() * step
+        value = min(max(snappedValue, range.lowerBound), range.upperBound)
     }
 }
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.8
+
+- Redesigned the Strip Gap control as a compact, high-contrast slider with clear keyboard and VoiceOver adjustment support.
+- Updated website download buttons to use the latest macOS and Windows GitHub release assets.
+
 ## 1.0.7
 
 - Restore tracked window positions before normal app termination on macOS and Windows.

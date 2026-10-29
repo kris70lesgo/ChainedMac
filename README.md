@@ -80,7 +80,7 @@ Open `website/index.html` or serve the `website/` directory with any static HTTP
 
 ## GitHub release builds
 
-Pushing a version tag such as `v1.0.7` runs the release workflow. macOS CI builds the universal app; Windows CI builds the self-contained x64 app. The workflow attaches the Mac DMG, Windows ZIP, and a SHA-256 checksum file to the GitHub Release. The Mac app is ad hoc signed and Windows SmartScreen may warn about the unsigned executable.
+Pushing a version tag such as `v1.0.8` runs the release workflow. macOS CI builds the universal app; Windows CI builds the self-contained x64 app. The workflow attaches the Mac DMG, Windows ZIP, and a SHA-256 checksum file to the GitHub Release. The Mac app is ad hoc signed and Windows SmartScreen may warn about the unsigned executable.
 
 ## Implementation notes
 
