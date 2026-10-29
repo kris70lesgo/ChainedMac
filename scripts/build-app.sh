@@ -22,8 +22,8 @@ mkdir -p "$ROOT/dist" "$ROOT/website/downloads"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 lipo -create "$ARM64_BINARY" "$X64_BINARY" -output "$APP/Contents/MacOS/ChainedMac"
-lipo -verify_arch arm64 "$APP/Contents/MacOS/ChainedMac"
-lipo -verify_arch x86_64 "$APP/Contents/MacOS/ChainedMac"
+lipo "$APP/Contents/MacOS/ChainedMac" -verify_arch arm64
+lipo "$APP/Contents/MacOS/ChainedMac" -verify_arch x86_64
 cp "$RESOURCES/ChainedMacMenuBarMark.png" "$APP/Contents/Resources/ChainedMacMenuBarMark.png"
 cp "$RESOURCES/ChainedMacAppIcon.icns" "$APP/Contents/Resources/ChainedMacAppIcon.icns"
 cat > "$APP/Contents/Info.plist" <<'PLIST'
